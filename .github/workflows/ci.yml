@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: gradle
+
+      - name: Build and test
+        run: ./gradlew clean test build --no-daemon
+
+      - name: Check overlay JavaScript syntax
+        run: node --check < src/main/resources/web/overlay.js.template
+
+      - name: Static safety checks
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if grep -RIn "innerHTML" src/main/resources src/main/java; then
+            echo "Unexpected innerHTML usage found"
+            exit 1
+          fi
+
+          if grep -RIn "setPlayerVisibility" src/main/java src/main/resources; then
+            echo "Unexpected native BlueMap marker modification found"
+            exit 1
+          fi
+
+          if grep -RIn "plugins/BlueMap\\|plugins/LuckPerms" src/main/java src/main/resources; then
+            echo "Unexpected source reference to BlueMap/LuckPerms plugin folder write target found"
+            exit 1
+          fi
