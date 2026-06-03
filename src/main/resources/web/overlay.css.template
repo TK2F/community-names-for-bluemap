@@ -1,0 +1,396 @@
+.bm-roster {
+  position: fixed;
+  left: auto;
+  top: auto;
+  z-index: 10000;
+  width: min(360px, calc(100vw - 16px));
+  --bm-roster-opacity: 0.86;
+  --bm-roster-accent: #76cfff;
+  color: #f6f7f8;
+  font: 13px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.bm-roster [hidden] {
+  display: none !important;
+}
+
+.bm-roster__collapsed-bar,
+.bm-roster__panel {
+  background: rgba(18, 20, 24, var(--bm-roster-opacity));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.26);
+  backdrop-filter: blur(12px);
+}
+
+.bm-roster__collapsed-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  max-width: min(360px, calc(100vw - 16px));
+  min-height: 36px;
+  padding: 0 13px;
+  border-radius: 999px;
+  color: #f6f7f8;
+  font: inherit;
+  cursor: move;
+}
+
+.bm-roster__collapsed-bar strong {
+  font-size: 14px;
+}
+
+.bm-roster__collapsed-bar span {
+  white-space: nowrap;
+}
+
+.bm-roster__panel {
+  position: relative;
+  display: grid;
+  gap: 7px;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 14px;
+  padding: 9px;
+}
+
+.bm-roster__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  cursor: move;
+  user-select: none;
+}
+
+.bm-roster__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.bm-roster__count {
+  color: #c8ced8;
+  white-space: nowrap;
+}
+
+.bm-roster__actions {
+  display: flex;
+  gap: 4px;
+}
+
+.bm-roster__button,
+.bm-roster__clear {
+  min-height: 26px;
+  padding: 0 7px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.055);
+  color: #f6f7f8;
+  font: inherit;
+  cursor: pointer;
+}
+
+.bm-roster__button:hover,
+.bm-roster__button:focus-visible,
+.bm-roster__clear:hover,
+.bm-roster__clear:focus-visible,
+.bm-roster__button--active {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.bm-roster__button--active {
+  border-color: var(--bm-roster-accent);
+}
+
+.bm-roster__search {
+  width: 100%;
+  min-height: 32px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.18);
+  color: #f6f7f8;
+  font: inherit;
+  padding: 5px 12px;
+}
+
+.bm-roster__active-filters,
+.bm-roster__filter-options,
+.bm-player__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.bm-roster__filter-panel {
+  display: grid;
+  gap: 6px;
+  padding: 7px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.bm-roster__settings-panel {
+  position: absolute;
+  top: 42px;
+  right: 9px;
+  z-index: 1;
+  display: grid;
+  gap: 8px;
+  width: min(240px, calc(100% - 18px));
+  box-sizing: border-box;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(18, 20, 24, 0.96);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+}
+
+.bm-roster__settings-title {
+  color: #f6f7f8;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.bm-roster__setting-row {
+  display: grid;
+  grid-template-columns: minmax(46px, auto) minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  color: #c8ced8;
+  font-size: 12px;
+}
+
+.bm-roster__setting-row input[type="range"],
+.bm-roster__setting-row select {
+  width: 100%;
+}
+
+.bm-roster__setting-row input[type="color"] {
+  width: 44px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.bm-roster__density {
+  min-height: 28px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.22);
+  color: #f6f7f8;
+  font: inherit;
+  padding: 3px 8px;
+}
+
+.bm-roster__setting-toggle,
+.bm-roster__settings-button {
+  min-height: 27px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #f6f7f8;
+  font: inherit;
+  padding: 2px 9px;
+  cursor: pointer;
+}
+
+.bm-roster__setting-toggle:hover,
+.bm-roster__setting-toggle:focus-visible,
+.bm-roster__settings-button:hover,
+.bm-roster__settings-button:focus-visible {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.bm-roster__settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bm-roster__filter-section {
+  display: grid;
+  gap: 5px;
+}
+
+.bm-roster__filter-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 26px;
+  padding: 0 2px;
+  border: 0;
+  background: transparent;
+  color: #f6f7f8;
+  font: inherit;
+  cursor: pointer;
+}
+
+.bm-roster__filter-heading span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.bm-roster__filter-heading span:nth-child(2) {
+  color: #9fa8b5;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.bm-roster__filter-body {
+  display: grid;
+  gap: 5px;
+}
+
+.bm-roster__filter-label {
+  color: #c8ced8;
+  font-size: 12px;
+}
+
+.bm-roster__filter-search {
+  width: 100%;
+  min-height: 28px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.22);
+  color: #f6f7f8;
+  font: inherit;
+  padding: 4px 10px;
+}
+
+.bm-roster__more {
+  justify-self: start;
+  min-height: 24px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #c8ced8;
+  font: inherit;
+  cursor: pointer;
+}
+
+.bm-roster__more:hover,
+.bm-roster__more:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  color: #f6f7f8;
+}
+
+.bm-chip {
+  min-height: 23px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 2px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.075);
+  color: #f6f7f8;
+  font: inherit;
+  overflow-wrap: anywhere;
+}
+
+button.bm-chip {
+  cursor: pointer;
+}
+
+.bm-chip:disabled {
+  color: #8d96a3;
+  cursor: default;
+}
+
+.bm-chip--active {
+  border-color: var(--bm-roster-accent);
+  background: rgba(75, 160, 205, 0.26);
+}
+
+.bm-roster__list {
+  display: grid;
+  gap: 5px;
+  max-height: min(520px, 70vh);
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.bm-player {
+  display: grid;
+  gap: 3px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.085);
+}
+
+.bm-player__main {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.bm-player__sub {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #c8ced8;
+  font-size: 12px;
+}
+
+.bm-player__chips .bm-chip {
+  min-height: 21px;
+  padding: 1px 7px;
+  color: #e9eef5;
+  background: rgba(255, 255, 255, 0.105);
+}
+
+.bm-player__hidden-details {
+  justify-self: start;
+  min-height: 20px;
+  box-sizing: border-box;
+  padding: 1px 7px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  color: #c8ced8;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 12px;
+}
+
+.bm-roster--compact .bm-roster__panel {
+  gap: 6px;
+  padding: 8px;
+}
+
+.bm-roster--compact .bm-roster__search {
+  min-height: 30px;
+  padding-block: 3px;
+}
+
+.bm-roster--compact .bm-player {
+  gap: 2px;
+  padding: 6px 8px;
+}
+
+.bm-roster--compact .bm-chip {
+  min-height: 21px;
+  padding: 1px 7px;
+}
+
+.bm-roster__empty,
+.bm-roster__error {
+  color: #c8ced8;
+  padding: 6px 2px;
+}
+
+.bm-roster__error:empty {
+  display: none;
+}

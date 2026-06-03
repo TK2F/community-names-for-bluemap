@@ -1,0 +1,18 @@
+name: BlueMapCommunityNames
+version: ${version}
+main: com.tk2lab.bluemapcommunitynames.BlueMapCommunityNamesPlugin
+api-version: "26.1.2"
+depend:
+  - BlueMap
+  - LuckPerms
+softdepend:
+  - floodgate
+commands:
+  bcn:
+    description: BlueMapCommunityNames administration
+    usage: /bcn <status|rebuild|reload>
+    permission: bluemapcommunitynames.admin
+permissions:
+  bluemapcommunitynames.admin:
+    description: Allows BlueMapCommunityNames administration commands
+    default: op

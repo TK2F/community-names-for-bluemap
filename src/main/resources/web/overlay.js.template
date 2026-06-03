@@ -1,0 +1,891 @@
+(function () {
+  "use strict";
+
+  const config = {
+    title: "__BCN_PANEL_TITLE__",
+    jsonUrl: "__BCN_JSON_URL__",
+    pollMillis: __BCN_POLL_MILLIS__
+  };
+  const storageKey = "BlueMapCommunityNames.roster.v2";
+  const appearanceKey = "BlueMapCommunityNames.roster.appearance.v2";
+  const defaultState = { x: null, y: null, expanded: false, filtersOpen: false, detailsCollapsed: null, settingsOpen: false, fieldSections: {}, fieldExpandedValues: {}, fieldQueries: {} };
+  const defaultAppearance = { opacity: 0.86, accentColor: "#76cfff", density: "comfortable", language: "ja" };
+  const labels = {
+    ja: {
+      players: "プレイヤー",
+      filters: "フィルター",
+      search: "検索",
+      settings: "設定",
+      details: "詳細",
+      opacity: "透明度",
+      density: "密度",
+      language: "言語",
+      all: "すべて",
+      none: "なし",
+      clear: "解除",
+      showTags: "タグを表示",
+      hideTags: "タグを隠す",
+      resetPosition: "位置を戻す",
+      resetAppearance: "表示を戻す",
+      valueSearch: "値を検索",
+      showLess: "閉じる",
+      compact: "コンパクト",
+      comfortable: "標準",
+      noPlayers: "オンラインなし",
+      noMatches: "該当なし",
+      japanese: "日本語",
+      english: "English",
+      countSuffix: "件",
+      moreSuffix: "件",
+      detailSuffix: "件"
+    },
+    en: {
+      players: "Players",
+      filters: "Filters",
+      search: "Search",
+      settings: "Settings",
+      details: "Details",
+      opacity: "Opacity",
+      density: "Density",
+      language: "Language",
+      all: "All",
+      none: "None",
+      clear: "Clear",
+      showTags: "Show tags",
+      hideTags: "Hide tags",
+      resetPosition: "Reset position",
+      resetAppearance: "Reset display",
+      valueSearch: "Search values",
+      showLess: "Show less",
+      compact: "Compact",
+      comfortable: "Comfortable",
+      noPlayers: "No players online",
+      noMatches: "No matching players",
+      japanese: "日本語",
+      english: "English",
+      countSuffix: "",
+      moreSuffix: " more",
+      detailSuffix: " details"
+    }
+  };
+
+  let root;
+  let collapsedBar;
+  let panel;
+  let header;
+  let title;
+  let count;
+  let searchInput;
+  let filtersButton;
+  let settingsButton;
+  let filterPanel;
+  let settingsPanel;
+  let activeFilters;
+  let list;
+  let errorLine;
+  let state = loadState();
+  let appearance = loadAppearance();
+  let currentData = { players: [], fields: [], filterSettings: defaultFilterSettings(), detailsSettings: defaultDetailsSettings() };
+  let selectedFilters = {};
+  let drag = null;
+
+  function loadState() {
+    try {
+      const raw = window.localStorage && window.localStorage.getItem(storageKey);
+      if (!raw) return { ...defaultState };
+      const parsed = JSON.parse(raw);
+      return {
+        x: Number.isFinite(parsed.x) ? parsed.x : null,
+        y: Number.isFinite(parsed.y) ? parsed.y : null,
+        expanded: parsed.expanded === true,
+        filtersOpen: parsed.filtersOpen === true,
+        detailsCollapsed: typeof parsed.detailsCollapsed === "boolean" ? parsed.detailsCollapsed : null,
+        settingsOpen: false,
+        fieldSections: isObject(parsed.fieldSections) ? parsed.fieldSections : {},
+        fieldExpandedValues: isObject(parsed.fieldExpandedValues) ? parsed.fieldExpandedValues : {},
+        fieldQueries: isObject(parsed.fieldQueries) ? parsed.fieldQueries : {}
+      };
+    } catch (error) {
+      return { ...defaultState };
+    }
+  }
+
+  function saveState() {
+    try {
+      if (window.localStorage) window.localStorage.setItem(storageKey, JSON.stringify(state));
+    } catch (error) {
+      // Persistence is optional.
+    }
+  }
+
+  function loadAppearance() {
+    try {
+      const raw = window.localStorage && window.localStorage.getItem(appearanceKey);
+      if (!raw) return { ...defaultAppearance };
+      const parsed = JSON.parse(raw);
+      return {
+        opacity: clampNumber(parsed.opacity, 0.2, 1, defaultAppearance.opacity),
+        accentColor: defaultAppearance.accentColor,
+        density: parsed.density === "compact" ? "compact" : "comfortable",
+        language: parsed.language === "en" ? "en" : "ja"
+      };
+    } catch (error) {
+      return { ...defaultAppearance };
+    }
+  }
+
+  function saveAppearance() {
+    try {
+      if (window.localStorage) window.localStorage.setItem(appearanceKey, JSON.stringify(appearance));
+    } catch (error) {
+      // Appearance persistence is optional.
+    }
+  }
+
+  function isObject(value) {
+    return value !== null && typeof value === "object" && !Array.isArray(value);
+  }
+
+  function text(key) {
+    return (labels[appearance.language] && labels[appearance.language][key]) || labels.ja[key] || key;
+  }
+
+  function formatCount(count) {
+    if (appearance.language === "en") return String(count);
+    return count + text("countSuffix");
+  }
+
+  function formatValueCount(count) {
+    if (appearance.language === "en") return count + (count === 1 ? " value" : " values");
+    return formatCount(count);
+  }
+
+  function formatMoreCount(count) {
+    if (appearance.language === "en") return count + text("moreSuffix");
+    return formatCount(count);
+  }
+
+  function formatDetailCount(count) {
+    if (appearance.language === "en") return count + text("detailSuffix");
+    return formatCount(count);
+  }
+
+  function defaultFilterSettings() {
+    return {
+      enabled: true,
+      collapsedByDefault: true,
+      fieldSectionsCollapsedByDefault: true,
+      maxVisibleValuesPerField: 8,
+      highCardinalityThreshold: 12
+    };
+  }
+
+  function defaultDetailsSettings() {
+    return { defaultState: "expanded", allowToggle: true };
+  }
+
+  function clampNumber(value, min, max, fallback) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return fallback;
+    return Math.min(max, Math.max(min, number));
+  }
+
+  function ensureUi() {
+    if (root) return;
+
+    root = document.createElement("section");
+    root.className = "bm-roster";
+
+    collapsedBar = document.createElement("button");
+    collapsedBar.type = "button";
+    collapsedBar.className = "bm-roster__collapsed-bar";
+    collapsedBar.addEventListener("click", expandRoster);
+    collapsedBar.addEventListener("pointerdown", startDrag);
+
+    panel = document.createElement("div");
+    panel.className = "bm-roster__panel";
+
+    header = document.createElement("div");
+    header.className = "bm-roster__header";
+    header.addEventListener("pointerdown", startDrag);
+
+    title = document.createElement("div");
+    title.className = "bm-roster__title";
+    title.textContent = text("players");
+
+    count = document.createElement("div");
+    count.className = "bm-roster__count";
+    count.textContent = "0 / 0";
+
+    const actions = document.createElement("div");
+    actions.className = "bm-roster__actions";
+
+    filtersButton = iconButton(text("filters"), toggleFilters);
+    settingsButton = iconButton("⚙", toggleSettings);
+    const collapseButton = iconButton("▴", collapseRoster);
+
+    actions.appendChild(filtersButton);
+    actions.appendChild(settingsButton);
+    actions.appendChild(collapseButton);
+
+    header.appendChild(title);
+    header.appendChild(count);
+    header.appendChild(actions);
+
+    searchInput = document.createElement("input");
+    searchInput.className = "bm-roster__search";
+    searchInput.type = "search";
+    searchInput.placeholder = text("search");
+    searchInput.addEventListener("input", render);
+    searchInput.addEventListener("pointerdown", stopControlPointer);
+
+    activeFilters = document.createElement("div");
+    activeFilters.className = "bm-roster__active-filters";
+
+    filterPanel = document.createElement("div");
+    filterPanel.className = "bm-roster__filter-panel";
+
+    settingsPanel = document.createElement("div");
+    settingsPanel.className = "bm-roster__settings-panel";
+
+    errorLine = document.createElement("div");
+    errorLine.className = "bm-roster__error";
+
+    list = document.createElement("div");
+    list.className = "bm-roster__list";
+
+    panel.appendChild(header);
+    panel.appendChild(searchInput);
+    panel.appendChild(activeFilters);
+    panel.appendChild(filterPanel);
+    panel.appendChild(settingsPanel);
+    panel.appendChild(errorLine);
+    panel.appendChild(list);
+    root.appendChild(collapsedBar);
+    root.appendChild(panel);
+    document.body.appendChild(root);
+
+    applyState();
+    applyAppearance();
+    window.addEventListener("resize", clampToViewport);
+  }
+
+  function iconButton(text, onClick) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "bm-roster__button";
+    button.textContent = text;
+    button.addEventListener("pointerdown", stopControlPointer);
+    button.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      onClick();
+    });
+    return button;
+  }
+
+  function stopControlPointer(event) {
+    event.stopPropagation();
+  }
+
+  function expandRoster() {
+    state.expanded = true;
+    applyState();
+    saveState();
+  }
+
+  function collapseRoster() {
+    state.expanded = false;
+    state.filtersOpen = false;
+    state.settingsOpen = false;
+    applyState();
+    saveState();
+  }
+
+  function toggleFilters() {
+    if (currentData.fields.length === 0) return;
+    state.filtersOpen = !state.filtersOpen;
+    applyState();
+    saveState();
+  }
+
+  function toggleDetails() {
+    if (currentData.detailsSettings.allowToggle === false) return;
+    state.detailsCollapsed = !detailsCollapsed();
+    applyState();
+    saveState();
+    renderList(visiblePlayers());
+  }
+
+  function toggleSettings() {
+    state.settingsOpen = !state.settingsOpen;
+    applyState();
+    saveState();
+  }
+
+  function resetPosition() {
+    state.x = null;
+    state.y = null;
+    state.expanded = false;
+    state.filtersOpen = false;
+    state.settingsOpen = false;
+    applyState();
+    saveState();
+  }
+
+  function applyState() {
+    root.classList.toggle("bm-roster--expanded", state.expanded);
+    root.classList.toggle("bm-roster--filters-open", state.filtersOpen);
+    collapsedBar.hidden = state.expanded;
+    panel.hidden = !state.expanded;
+    filterPanel.hidden = !state.filtersOpen;
+    settingsPanel.hidden = !state.settingsOpen;
+    filtersButton.classList.toggle("bm-roster__button--active", state.filtersOpen);
+    settingsButton.classList.toggle("bm-roster__button--active", state.settingsOpen);
+    if (state.x === null || state.y === null) {
+      const rect = root.getBoundingClientRect();
+      state.x = Math.max(8, window.innerWidth - rect.width - 16);
+      state.y = 16;
+    }
+    clampToViewport();
+  }
+
+  function detailsCollapsed() {
+    if (typeof state.detailsCollapsed === "boolean") {
+      return state.detailsCollapsed;
+    }
+    return currentData.detailsSettings.defaultState === "collapsed";
+  }
+
+  function applyAppearance() {
+    if (!root) return;
+    root.style.setProperty("--bm-roster-opacity", String(appearance.opacity));
+    root.style.setProperty("--bm-roster-accent", appearance.accentColor);
+    root.classList.toggle("bm-roster--compact", appearance.density === "compact");
+  }
+
+  function clampToViewport() {
+    if (!root) return;
+    const rect = root.getBoundingClientRect();
+    const maxX = Math.max(8, window.innerWidth - rect.width - 8);
+    const maxY = Math.max(8, window.innerHeight - rect.height - 8);
+    state.x = Math.min(Math.max(8, state.x || 8), maxX);
+    state.y = Math.min(Math.max(8, state.y || 8), maxY);
+    root.style.left = state.x + "px";
+    root.style.top = state.y + "px";
+    saveState();
+  }
+
+  function startDrag(event) {
+    if (event.button !== 0) return;
+    const rect = root.getBoundingClientRect();
+    drag = { pointerId: event.pointerId, dx: event.clientX - rect.left, dy: event.clientY - rect.top };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    event.currentTarget.addEventListener("pointermove", onDrag);
+    event.currentTarget.addEventListener("pointerup", stopDrag, { once: true });
+    event.currentTarget.addEventListener("pointercancel", stopDrag, { once: true });
+  }
+
+  function onDrag(event) {
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    state.x = event.clientX - drag.dx;
+    state.y = event.clientY - drag.dy;
+    clampToViewport();
+  }
+
+  function stopDrag(event) {
+    event.currentTarget.removeEventListener("pointermove", onDrag);
+    drag = null;
+    saveState();
+  }
+
+  function normalizeData(data) {
+    const roster = data && data.roster ? data.roster : {};
+    const display = data && data.display ? data.display : {};
+    const fields = Array.isArray(roster.fields) ? roster.fields
+      : Array.isArray(display.fields) ? display.fields : [];
+    const players = Array.isArray(data && data.players) ? data.players : [];
+    return {
+      fields: fields.filter(field => field && field.filterable !== false),
+      players,
+      filterSettings: normalizeFilterSettings(roster.filters),
+      detailsSettings: normalizeDetailsSettings(roster.details)
+    };
+  }
+
+  function normalizeDetailsSettings(details) {
+    const defaults = defaultDetailsSettings();
+    if (!details) return defaults;
+    return {
+      defaultState: details.defaultState === "collapsed" ? "collapsed" : "expanded",
+      allowToggle: details.allowToggle !== false
+    };
+  }
+
+  function normalizeFilterSettings(filters) {
+    const defaults = defaultFilterSettings();
+    if (!filters) return defaults;
+    return {
+      enabled: filters.enabled !== false,
+      collapsedByDefault: filters.collapsedByDefault !== false,
+      fieldSectionsCollapsedByDefault: filters.fieldSectionsCollapsedByDefault !== false,
+      maxVisibleValuesPerField: positiveNumber(filters.maxVisibleValuesPerField, defaults.maxVisibleValuesPerField),
+      highCardinalityThreshold: positiveNumber(filters.highCardinalityThreshold, defaults.highCardinalityThreshold)
+    };
+  }
+
+  function positiveNumber(value, fallback) {
+    return Number.isFinite(value) && value > 0 ? value : fallback;
+  }
+
+  function render() {
+    ensureUi();
+    const visible = visiblePlayers();
+    title.textContent = text("players");
+    filtersButton.textContent = text("filters");
+    searchInput.placeholder = text("search");
+    renderCollapsedBar(visible.length, currentData.players.length);
+    count.textContent = visible.length + " / " + currentData.players.length;
+    filtersButton.hidden = currentData.fields.length === 0 || currentData.filterSettings.enabled === false;
+    if (currentData.fields.length === 0 || currentData.filterSettings.enabled === false) {
+      state.filtersOpen = false;
+    }
+    renderActiveFilters();
+    renderFilterPanel();
+    renderSettingsPanel();
+    renderList(visible);
+  }
+
+  function visiblePlayers() {
+    const query = searchInput.value.trim().toLowerCase();
+    return currentData.players.filter(function (player) {
+      const searchable = String(player.filterText || player.displayName || player.display || player.playerName || "").toLowerCase();
+      if (query && !searchable.includes(query)) return false;
+      return Object.keys(selectedFilters).every(function (key) {
+        const expected = selectedFilters[key];
+        return (Array.isArray(player.metaValues) ? player.metaValues : [])
+          .some(meta => (meta.id || meta.key) === key && String(meta.value) === expected);
+      });
+    });
+  }
+
+  function renderCollapsedBar(visible, total) {
+    collapsedBar.replaceChildren();
+    const label = document.createElement("span");
+    label.textContent = text("players");
+    const playerCount = document.createElement("strong");
+    playerCount.textContent = String(total);
+    const activeFilterCount = Object.keys(selectedFilters).length;
+    const arrow = document.createElement("span");
+    arrow.textContent = "▾";
+    collapsedBar.appendChild(label);
+    collapsedBar.appendChild(playerCount);
+    if (activeFilterCount > 0) {
+      const filterCount = document.createElement("span");
+      filterCount.textContent = text("filters") + " " + activeFilterCount;
+      collapsedBar.appendChild(filterCount);
+    }
+    collapsedBar.appendChild(arrow);
+    collapsedBar.title = text("players") + " " + visible + " / " + total;
+  }
+
+  function renderActiveFilters() {
+    activeFilters.replaceChildren();
+    const keys = Object.keys(selectedFilters);
+    activeFilters.hidden = keys.length === 0;
+    for (const key of keys) {
+      const field = currentData.fields.find(item => (item.id || item.key) === key);
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "bm-chip bm-chip--active";
+      chip.textContent = (field && field.label ? field.label : key) + " " + selectedFilters[key] + " ×";
+      chip.addEventListener("click", function () {
+        delete selectedFilters[key];
+        render();
+      });
+      activeFilters.appendChild(chip);
+    }
+  }
+
+  function renderFilterPanel() {
+    filterPanel.replaceChildren();
+    for (const field of currentData.fields.slice(0, 3)) {
+      const key = field.id || field.key || "";
+      const values = valueCounts(key);
+      const section = document.createElement("div");
+      section.className = "bm-roster__filter-section";
+
+      const heading = document.createElement("button");
+      heading.type = "button";
+      heading.className = "bm-roster__filter-heading";
+      heading.addEventListener("click", function () {
+        state.fieldSections[key] = !fieldSectionOpen(key);
+        saveState();
+        render();
+      });
+
+      const label = document.createElement("span");
+      label.textContent = field.label || key || "Field";
+      const summary = document.createElement("span");
+      summary.textContent = filterSummary(values.length);
+      const arrow = document.createElement("span");
+      arrow.textContent = fieldSectionOpen(key) ? "▾" : "▸";
+      heading.appendChild(label);
+      heading.appendChild(summary);
+      heading.appendChild(arrow);
+      section.appendChild(heading);
+
+      if (!fieldSectionOpen(key)) {
+        filterPanel.appendChild(section);
+        continue;
+      }
+
+      const body = document.createElement("div");
+      body.className = "bm-roster__filter-body";
+
+      const options = document.createElement("div");
+      options.className = "bm-roster__filter-options";
+      options.appendChild(filterOption(key, "", text("all"), selectedFilters[key] === undefined, false));
+      if (values.length === 0) {
+        options.appendChild(filterOption(key, "", text("none"), false, true));
+      }
+
+      const highCardinality = values.length > currentData.filterSettings.highCardinalityThreshold;
+      let filteredValues = values;
+      if (highCardinality) {
+        body.appendChild(fieldValueSearch(key));
+        const query = String(state.fieldQueries[key] || "").trim().toLowerCase();
+        if (query) {
+          filteredValues = values.filter(entry => entry.value.toLowerCase().includes(query));
+        }
+      }
+
+      const maxVisible = currentData.filterSettings.maxVisibleValuesPerField;
+      const expanded = state.fieldExpandedValues[key] === true;
+      const visibleValues = expanded ? filteredValues : filteredValues.slice(0, maxVisible);
+      for (const entry of visibleValues) {
+        options.appendChild(filterOption(key, entry.value, entry.value + " (" + entry.count + ")", selectedFilters[key] === entry.value, false));
+      }
+
+      body.appendChild(options);
+      if (filteredValues.length > maxVisible) {
+        body.appendChild(showMoreButton(key, filteredValues.length - maxVisible, expanded));
+      }
+      section.appendChild(body);
+      filterPanel.appendChild(section);
+    }
+
+    const clear = document.createElement("button");
+    clear.type = "button";
+    clear.className = "bm-roster__clear";
+    clear.textContent = text("clear");
+    clear.addEventListener("click", clearFilters);
+    filterPanel.appendChild(clear);
+  }
+
+  function filterSummary(count) {
+    if (count === 0) return text("none");
+    return formatValueCount(count);
+  }
+
+  function renderSettingsPanel() {
+    settingsPanel.replaceChildren();
+    const title = document.createElement("div");
+    title.className = "bm-roster__settings-title";
+    title.textContent = text("settings");
+    settingsPanel.appendChild(title);
+    settingsPanel.appendChild(settingLabel(text("language"), languageControl()));
+    if (currentData.detailsSettings.allowToggle !== false) {
+      settingsPanel.appendChild(settingLabel(text("details"), detailsControl()));
+    }
+    settingsPanel.appendChild(settingLabel(text("opacity"), opacityControl()));
+    settingsPanel.appendChild(settingLabel(text("density"), densityControl()));
+    const actions = document.createElement("div");
+    actions.className = "bm-roster__settings-actions";
+    const resetPositionButton = actionButton(text("resetPosition"), resetPosition);
+    const resetAppearanceButton = actionButton(text("resetAppearance"), resetAppearance);
+    actions.appendChild(resetPositionButton);
+    actions.appendChild(resetAppearanceButton);
+    settingsPanel.appendChild(actions);
+  }
+
+  function settingLabel(text, control) {
+    const label = document.createElement("label");
+    label.className = "bm-roster__setting-row";
+    const span = document.createElement("span");
+    span.textContent = text;
+    label.appendChild(span);
+    label.appendChild(control);
+    return label;
+  }
+
+  function opacityControl() {
+    const input = document.createElement("input");
+    input.type = "range";
+    input.min = "20";
+    input.max = "100";
+    input.value = String(Math.round(appearance.opacity * 100));
+    input.addEventListener("input", function () {
+      appearance.opacity = clampNumber(Number(input.value) / 100, 0.2, 1, defaultAppearance.opacity);
+      applyAppearance();
+      saveAppearance();
+    });
+    input.addEventListener("pointerdown", stopControlPointer);
+    return input;
+  }
+
+  function detailsControl() {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "bm-roster__setting-toggle";
+    button.textContent = detailsCollapsed() ? text("showTags") : text("hideTags");
+    button.addEventListener("pointerdown", stopControlPointer);
+    button.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleDetails();
+      renderSettingsPanel();
+    });
+    return button;
+  }
+
+  function densityControl() {
+    const select = document.createElement("select");
+    select.className = "bm-roster__density";
+    for (const value of ["comfortable", "compact"]) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = value === "compact" ? text("compact") : text("comfortable");
+      select.appendChild(option);
+    }
+    select.value = appearance.density;
+    select.addEventListener("change", function () {
+      appearance.density = select.value === "compact" ? "compact" : "comfortable";
+      applyAppearance();
+      saveAppearance();
+    });
+    select.addEventListener("pointerdown", stopControlPointer);
+    return select;
+  }
+
+  function languageControl() {
+    const select = document.createElement("select");
+    select.className = "bm-roster__density";
+    for (const value of ["ja", "en"]) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = value === "en" ? text("english") : text("japanese");
+      select.appendChild(option);
+    }
+    select.value = appearance.language;
+    select.addEventListener("change", function () {
+      appearance.language = select.value === "en" ? "en" : "ja";
+      saveAppearance();
+      render();
+    });
+    select.addEventListener("pointerdown", stopControlPointer);
+    return select;
+  }
+
+  function actionButton(text, onClick) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "bm-roster__settings-button";
+    button.textContent = text;
+    button.addEventListener("pointerdown", stopControlPointer);
+    button.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      onClick();
+      renderSettingsPanel();
+    });
+    return button;
+  }
+
+  function resetAppearance() {
+    appearance = { ...defaultAppearance };
+    applyAppearance();
+    saveAppearance();
+  }
+
+  function fieldSectionOpen(key) {
+    if (Object.prototype.hasOwnProperty.call(state.fieldSections, key)) {
+      return state.fieldSections[key] === true;
+    }
+    return currentData.filterSettings.fieldSectionsCollapsedByDefault !== true;
+  }
+
+  function fieldValueSearch(key) {
+    const input = document.createElement("input");
+    input.className = "bm-roster__filter-search";
+    input.type = "search";
+    input.placeholder = text("valueSearch");
+    input.value = String(state.fieldQueries[key] || "");
+    input.addEventListener("input", function () {
+      state.fieldQueries[key] = input.value;
+      state.fieldExpandedValues[key] = false;
+      saveState();
+      render();
+    });
+    input.addEventListener("pointerdown", stopControlPointer);
+    return input;
+  }
+
+  function showMoreButton(key, hiddenCount, expanded) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "bm-roster__more";
+    button.textContent = expanded ? text("showLess") : "+ " + formatMoreCount(hiddenCount);
+    button.addEventListener("click", function () {
+      state.fieldExpandedValues[key] = !expanded;
+      saveState();
+      render();
+    });
+    return button;
+  }
+
+  function filterOption(key, value, text, active, disabled) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "bm-chip";
+    button.disabled = disabled;
+    button.classList.toggle("bm-chip--active", active);
+    button.textContent = text;
+    button.addEventListener("click", function () {
+      if (value) selectedFilters[key] = value;
+      else delete selectedFilters[key];
+      render();
+    });
+    return button;
+  }
+
+  function valueCounts(key) {
+    const values = new Map();
+    for (const player of currentData.players) {
+      for (const meta of Array.isArray(player.metaValues) ? player.metaValues : []) {
+        const metaKey = meta.id || meta.key;
+        const value = metaKey === key && meta.value ? String(meta.value).trim() : "";
+        if (value) values.set(value, (values.get(value) || 0) + 1);
+      }
+    }
+    return Array.from(values, function ([value, count]) { return { value, count }; })
+      .sort(function (a, b) {
+        if (b.count !== a.count) return b.count - a.count;
+        return a.value.localeCompare(b.value);
+      });
+  }
+
+  function clearFilters() {
+    searchInput.value = "";
+    selectedFilters = {};
+    render();
+  }
+
+  function renderList(players) {
+    list.replaceChildren();
+    if (currentData.players.length === 0) {
+      renderMessage(text("noPlayers"));
+      return;
+    }
+    if (players.length === 0) {
+      renderMessage(text("noMatches"));
+      return;
+    }
+    for (const player of players) {
+      list.appendChild(playerRow(player));
+    }
+  }
+
+  function playerRow(player) {
+    const row = document.createElement("div");
+    row.className = "bm-player";
+
+    const main = document.createElement("div");
+    main.className = "bm-player__main";
+    main.textContent = String(player.displayName || player.display || player.playerName || "");
+    row.appendChild(main);
+
+    const subName = player.subName || (player.displayName && player.displayName !== player.playerName ? "@" + player.playerName : "");
+    if (subName) {
+      const sub = document.createElement("div");
+      sub.className = "bm-player__sub";
+      sub.textContent = String(subName);
+      row.appendChild(sub);
+    }
+
+    const chips = Array.isArray(player.chips) ? player.chips : chipsFromLegacy(player);
+    if (chips.length > 0) {
+      if (detailsCollapsed()) {
+        const hidden = document.createElement("div");
+        hidden.className = "bm-player__hidden-details";
+        hidden.textContent = formatDetailCount(chips.length);
+        row.appendChild(hidden);
+      } else {
+        const chipLine = document.createElement("div");
+        chipLine.className = "bm-player__chips";
+        for (const chipValue of chips) {
+          const chip = document.createElement("span");
+          chip.className = "bm-chip";
+          chip.textContent = String(chipValue.value || chipValue);
+          chipLine.appendChild(chip);
+        }
+        row.appendChild(chipLine);
+      }
+    }
+    return row;
+  }
+
+  function chipsFromLegacy(player) {
+    return (Array.isArray(player.metaValues) ? player.metaValues : [])
+      .filter(meta => meta.display === "chip");
+  }
+
+  function renderMessage(message) {
+    const row = document.createElement("div");
+    row.className = "bm-roster__empty";
+    row.textContent = message;
+    list.appendChild(row);
+  }
+
+  function pruneInvalidFilters() {
+    for (const key of Object.keys(selectedFilters)) {
+      if (!valueCounts(key).some(entry => entry.value === selectedFilters[key])) {
+        delete selectedFilters[key];
+      }
+    }
+  }
+
+  async function refresh() {
+    ensureUi();
+    try {
+      const response = await fetch(config.jsonUrl, { cache: "no-store" });
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      currentData = normalizeData(await response.json());
+      errorLine.textContent = "";
+      pruneInvalidFilters();
+      applyState();
+      render();
+    } catch (error) {
+      errorLine.textContent = "Roster unavailable";
+      currentData = {
+        fields: currentData.fields || [],
+        players: [],
+        filterSettings: currentData.filterSettings || defaultFilterSettings(),
+        detailsSettings: currentData.detailsSettings || defaultDetailsSettings()
+      };
+      render();
+    }
+  }
+
+  function start() {
+    ensureUi();
+    refresh();
+    window.setInterval(refresh, config.pollMillis);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start, { once: true });
+  } else {
+    start();
+  }
+})();

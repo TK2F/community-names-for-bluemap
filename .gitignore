@@ -1,0 +1,45 @@
+# Build outputs
+/build/
+/.gradle/
+out/
+target/
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Minecraft runtime/server data
+/plugins/
+/world/
+/world_nether/
+/world_the_end/
+/logs/
+/cache/
+server.properties
+banned-*.json
+ops.json
+whitelist.json
+usercache.json
+
+# Databases and logs
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# Local/test/proxy/runtime
+*.pid
+*.tmp
+*.bak
+*.local
+.env
+.env.*
+bcn-test-proxy.mjs
+
+# IDE/OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Internal-only docs
+docs/internal/

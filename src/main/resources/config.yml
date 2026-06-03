@@ -1,0 +1,107 @@
+# 互換用: v0.1 の単一メタキー設定です。通常は下の player-roster.luckperms-fields を使います。
+meta-key: "community_name"
+
+player-roster:
+  enabled: true
+
+  panel:
+    default-state: collapsed
+    position: top-right
+    max-height: 520px
+    max-height-vh: 70
+
+  name-display:
+    mode: community_name_as_primary
+    show-minecraft-id-as-subtext: true
+    minecraft-id-prefix: "@"
+
+  search:
+    enabled: true
+    targets:
+      - minecraft_id
+      - alias
+
+  # details はプレイヤー行のタグ表示エリアです。名前と Minecraft ID は常に表示されます。
+  details:
+    default-state: expanded
+    allow-toggle: true
+
+  filters:
+    enabled: true
+    collapsed-by-default: true
+    field-sections-collapsed-by-default: true
+    max-visible-values-per-field: 8
+    high-cardinality-threshold: 12
+
+  luckperms-fields:
+    # community_name / title / role はサンプルです。サーバーの LuckPerms meta key に置き換えてください。
+    # 0 から 3 個まで設定できます。fields: [] にすると Minecraft ID だけの名簿になります。
+    # display: alias はメイン表示名、display: chip はタグ風の値です。
+    # searchable は検索対象にするか、filterable は Filters UI に出すかを制御します。
+    max-fields: 3
+    fields:
+      - id: community_name
+        meta-key: community_name
+        label: "よび名"
+        display: alias
+        searchable: true
+        filterable: true
+
+      - id: title
+        meta-key: title
+        label: "称号"
+        display: chip
+        searchable: false
+        filterable: true
+
+      - id: role
+        meta-key: role
+        label: "ロール"
+        display: chip
+        searchable: false
+        filterable: true
+
+display:
+  separator: "/"
+  max-fields: 3
+  fields:
+    - key: "community_name"
+      label: "コミュニティ名"
+      enabled: true
+      filterable: true
+    - key: "title"
+      label: "肩書"
+      enabled: true
+      filterable: true
+    - key: "role"
+      label: "役割"
+      enabled: true
+      filterable: true
+
+web:
+  public-base-path: "/bcn/"
+  local-web-dir: "web"
+  script-file: "overlay.js"
+  style-file: "overlay.css"
+  json-file: "players.json"
+  panel-title: "Online Players"
+  poll-interval-seconds: 5
+
+sanitize:
+  trim: true
+  strip-legacy-section-codes: true
+  remove-control-chars: true
+  remove-bidi-controls: true
+  normalize: "NFC"
+  max-code-points: 24
+  ellipsis-on-truncate: true
+
+updates:
+  debounce-millis: 300
+  periodic-full-refresh-seconds: 10
+
+floodgate:
+  enabled: true
+
+logging:
+  debug: false
