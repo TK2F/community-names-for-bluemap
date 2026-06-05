@@ -1,79 +1,38 @@
-# Production Deploy Plan
+# Example Operational Install Plan
+
+This document is a public-safe example for administrators. It is not a universal
+production deployment plan. BlueMapCommunityNames does not own your BlueMap webserver,
+LuckPerms setup, Geyser/Floodgate identity model, nginx/reverse proxy, firewall, TLS, or
+network exposure.
 
 ## Scope
 
-BlueMapCommunityNames is an internal/private Paper plugin. This plan assumes no public
-release, no GitHub release, and no tag creation.
+BlueMapCommunityNames installs as a normal Paper plugin and writes only under:
 
-The deployment uses the strict-clean ownership model:
+```text
+plugins/BlueMapCommunityNames/
+```
 
-- The plugin may write only under `<PRODUCTION_SERVER_PATH>/plugins/BlueMapCommunityNames/`.
-- The plugin must not write under `<PRODUCTION_SERVER_PATH>/plugins/BlueMap/`.
-- The plugin must not write under `<PRODUCTION_SERVER_PATH>/plugins/LuckPerms/`.
-- The plugin must not write under Geyser or Floodgate plugin folders.
-- nginx or an equivalent same-origin reverse proxy exposes `/bcn/` to
-  `<PRODUCTION_SERVER_PATH>/plugins/BlueMapCommunityNames/web/`.
+It must not write under:
+
+```text
+plugins/BlueMap/
+plugins/LuckPerms/
+plugins/Geyser-Spigot/
+plugins/floodgate/
+```
 
 BlueMap native live markers are not modified.
 
-## Pre-Deploy Checks
+## Install Steps
 
-Record the current production state before making changes:
-
-```text
-Production server path: <PRODUCTION_SERVER_PATH>
-Production BlueMap URL: <PRODUCTION_BLUEMAP_URL>
-Production nginx config path: <PRODUCTION_NGINX_CONFIG_PATH>
-Paper version:
-BlueMap version:
-LuckPerms version:
-Geyser present:
-Floodgate present:
-```
-
-Prepare rollback inputs:
-
-```sh
-cp <PRODUCTION_NGINX_CONFIG_PATH> <PRODUCTION_NGINX_CONFIG_PATH>.pre-bcn-backup
-ls -la <PRODUCTION_SERVER_PATH>/plugins > <PRODUCTION_SERVER_PATH>/plugins.pre-bcn-list.txt
-```
-
-Confirm:
-
-- Maintenance window is approved if a server restart is needed.
-- Current BlueMap loads at `<PRODUCTION_BLUEMAP_URL>`.
-- LuckPerms is healthy.
-- nginx config test command is known for the production host.
-- Rollback plan is available before deploy.
-
-## Artifact
-
-Deploy artifact:
-
-```text
-build/libs/BlueMapCommunityNames-0.2.0.jar
-```
-
-Production destination:
-
-```text
-<PRODUCTION_SERVER_PATH>/plugins/BlueMapCommunityNames-0.2.0.jar
-```
-
-## Server Deploy Steps
-
-Preferred low-risk flow:
-
-1. Stop the server during the maintenance window.
-2. Copy the jar:
-
-```sh
-cp build/libs/BlueMapCommunityNames-0.2.0.jar <PRODUCTION_SERVER_PATH>/plugins/BlueMapCommunityNames-0.2.0.jar
-```
-
-3. Start the server.
-4. Confirm the plugin loads after BlueMap and LuckPerms.
-5. Run from console:
+1. Confirm BlueMap works before installing this plugin.
+2. Confirm LuckPerms works before installing this plugin.
+3. Stop the server if your operation policy requires offline plugin installation.
+4. Copy `BlueMapCommunityNames-0.2.0.jar` into the server `plugins/` directory.
+5. Start the server.
+6. Confirm BlueMapCommunityNames enables after BlueMap and LuckPerms.
+7. Run:
 
 ```text
 bcn status
@@ -81,189 +40,72 @@ bcn status
 
 Expected:
 
-- BlueMap detected: yes
-- LuckPerms detected: yes
-- Active roster fields show zero to three configured LuckPerms meta keys
-- Public base path: `/bcn/`
-- Last error: `none`
+- BlueMap detected.
+- LuckPerms detected.
+- Public base path is `/bcn/` by default.
+- Last error is `none`.
+- Active roster fields are zero to three configured LuckPerms meta keys.
 
-6. Verify generated files:
+Generated files:
 
 ```text
-<PRODUCTION_SERVER_PATH>/plugins/BlueMapCommunityNames/web/overlay.js
-<PRODUCTION_SERVER_PATH>/plugins/BlueMapCommunityNames/web/overlay.css
-<PRODUCTION_SERVER_PATH>/plugins/BlueMapCommunityNames/web/players.json
+plugins/BlueMapCommunityNames/web/overlay.js
+plugins/BlueMapCommunityNames/web/overlay.css
+plugins/BlueMapCommunityNames/web/players.json
 ```
 
-If roster fields are explicitly empty or invalid-only, the plugin warns when appropriate
-and uses a Minecraft-ID-only roster. `community_name`, `title`, and `role` are examples
-only, not required fields.
+## Optional Web Route
 
-## nginx Deploy Steps
+Some BlueMap web setups need an explicit route for `/bcn/`. nginx is one possible
+solution, but it is not required by this plugin. If you use a webserver or reverse proxy,
+adapt the route to your own environment.
 
-Add a `/bcn/` alias to the production BlueMap server block. Adapt paths to production:
-
-```nginx
-location ^~ /bcn/ {
-    alias <PRODUCTION_SERVER_PATH>/plugins/BlueMapCommunityNames/web/;
-    add_header Cache-Control "no-store, no-cache, must-revalidate, max-age=0" always;
-    expires off;
-    try_files $uri =404;
-}
-```
-
-Do not change existing BlueMap `/maps/*`, live-data, or upstream proxy behavior.
-
-Test and reload nginx:
-
-```sh
-nginx -t -c <PRODUCTION_NGINX_CONFIG_PATH>
-nginx -s reload
-```
-
-Run:
-
-```sh
-curl -I <PRODUCTION_BLUEMAP_URL>/bcn/overlay.js
-curl -I <PRODUCTION_BLUEMAP_URL>/bcn/overlay.css
-curl -I <PRODUCTION_BLUEMAP_URL>/bcn/players.json
-```
-
-Expected:
-
-- `overlay.js`: HTTP 200
-- `overlay.css`: HTTP 200
-- `players.json`: HTTP 200
-- `players.json`: `Cache-Control: no-store` or equivalent
-
-If `/bcn/` is missing, the server-side plugin still works and BlueMap still loads, but
-the browser overlay will not appear.
+See [Optional Reverse Proxy Example](REVERSE_PROXY_EXAMPLE.md).
 
 ## LuckPerms Setup
 
-Default example roster fields:
+Default sample fields are:
 
-```yaml
-meta-key: "community_name"
+- `community_name`
+- `title`
+- `role`
 
-player-roster:
-  name-display:
-    mode: alias_as_primary
-    show-minecraft-id-as-subtext: true
-    show-alias-as-subtext: true
-    show-alias-as-chip: false
-    minecraft-id-prefix: "@"
+These are examples only. Server owners may configure zero to three arbitrary LuckPerms
+meta keys in `plugins/BlueMapCommunityNames/config.yml`.
 
-  luckperms-fields:
-    max-fields: 3
-    fields:
-      - id: community_name
-        meta-key: community_name
-        label: "よび名"
-        display: alias
-        searchable: true
-        filterable: true
-      - id: title
-        meta-key: title
-        label: "称号"
-        display: chip
-        searchable: false
-        filterable: true
-      - id: role
-        meta-key: role
-        label: "ロール"
-        display: chip
-        searchable: false
-        filterable: true
-```
-
-`community_name`, `title`, and `role` are examples only. Server owners may configure
-zero to three arbitrary LuckPerms meta keys in:
+Example placeholder commands:
 
 ```text
-<PRODUCTION_SERVER_PATH>/plugins/BlueMapCommunityNames/config.yml
+/lp user <JAVA_PLAYER_NAME> meta set nickname <ALIAS_SAMPLE>
+/lp user <JAVA_PLAYER_NAME> meta set guild_name <GUILD_SAMPLE>
+/lp user <JAVA_PLAYER_NAME> meta set event_rank <EVENT_RANK_SAMPLE>
 ```
 
-After changing fields:
+Java and Bedrock/Floodgate identities may be separate LuckPerms users. Depending on your
+setup, Bedrock players may need UUID-based targeting. Do not publish real UUIDs.
+
+After config changes:
 
 ```text
 bcn reload
 bcn rebuild
 ```
 
-Example commands for the default sample keys:
-
-```text
-/lp user <JAVA_PLAYER_NAME> meta set community_name <ALIAS_SAMPLE>
-/lp user <JAVA_PLAYER_NAME> meta set title <TITLE_SAMPLE>
-/lp user <JAVA_PLAYER_NAME> meta set role <ROLE_SAMPLE>
-/lp user <BEDROCK_PLAYER_NAME> meta set community_name <BEDROCK_ALIAS_SAMPLE>
-/lp user <BEDROCK_PLAYER_NAME> meta set title <BEDROCK_TITLE_SAMPLE>
-/lp user <BEDROCK_PLAYER_NAME> meta set role <BEDROCK_ROLE_SAMPLE>
-```
-
-Java and Bedrock/Floodgate identities may be separate LuckPerms users. Both may need
-separate meta values. Missing values are omitted safely.
-
-`player-roster.name-display.mode` controls whether the alias field or Minecraft ID is
-the main roster display. Use `alias_as_primary`, `minecraft_id_as_primary`, or
-`minecraft_id_only` according to the production server culture.
-
-If a Bedrock/Floodgate prefixed username is rejected by LuckPerms command parsing, use
-UUID targeting:
-
-```text
-/lp user <BEDROCK_FLOODGATE_UUID> meta set community_name <BEDROCK_ALIAS_SAMPLE>
-```
-
 ## Browser Verification
 
-Open:
+- Open your BlueMap web URL.
+- Confirm BlueMap loads normally.
+- Confirm the BlueMapCommunityNames roster appears.
+- Confirm search, filters, details collapse, settings, opacity, and language switch work.
+- Confirm no empty chips or duplicate alias/Minecraft ID display appears.
+
+## Ownership Check
+
+After install, verify BlueMapCommunityNames-owned files are only under:
 
 ```text
-<PRODUCTION_BLUEMAP_URL>
+plugins/BlueMapCommunityNames/
 ```
 
-Expected:
-
-- BlueMap loads normally.
-- BlueMapCommunityNames overlay appears.
-- Native BlueMap marker remains `<JAVA_PLAYER_NAME>` or `<BEDROCK_PLAYER_NAME>`.
-- Roster display matches the configured `player-roster.name-display.mode`, and configured
-  chip fields appear when those values are present.
-- If no configured values are present for a player, the roster falls back to the
-  Minecraft player name.
-
-## Post-Deploy Checks
-
-Run:
-
-```text
-bcn status
-bcn rebuild
-bcn status
-```
-
-Check:
-
-- `players.json` is valid JSON.
-- `schemaVersion` is `2`.
-- No UUIDs are emitted by default.
-- Last error is `none`.
-- Server log has no BlueMapCommunityNames errors.
-- No BlueMapCommunityNames-owned files were written under:
-  - `<PRODUCTION_SERVER_PATH>/plugins/BlueMap/`
-  - `<PRODUCTION_SERVER_PATH>/plugins/LuckPerms/`
-  - Geyser/Floodgate plugin folders
-
-If BlueMap is reloaded:
-
-```text
-bluemap reload
-```
-
-Expected:
-
-- BlueMap reloads normally.
-- BlueMapCommunityNames script/style registration runs again.
-- `/bcn/` assets remain served by nginx.
+BlueMap, LuckPerms, Geyser, and Floodgate folders may contain their own normal runtime
+files, but this plugin should not create files there.

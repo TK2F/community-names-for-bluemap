@@ -1,89 +1,83 @@
-# Production Checklist
+# Operational Checklist
 
-## Pre-Deploy
+This is a public-safe checklist for administrators installing BlueMapCommunityNames in
+their own environment. It is not a deployment guarantee and does not replace BlueMap,
+LuckPerms, Geyser/Floodgate, nginx, firewall, TLS, or server operations documentation.
 
-- [ ] Confirm maintenance window if restart is needed.
-- [ ] Record Paper version.
-- [ ] Record BlueMap version.
-- [ ] Record LuckPerms version.
-- [ ] Record Geyser/Floodgate presence.
-- [ ] Record `<PRODUCTION_BLUEMAP_URL>`.
-- [ ] Record `<PRODUCTION_NGINX_CONFIG_PATH>`.
-- [ ] Back up nginx config.
-- [ ] Save current plugin list.
-- [ ] Confirm rollback plan is ready.
+## Before Installing
 
-## Deploy
+- [ ] BlueMap is installed and working independently.
+- [ ] LuckPerms is installed and working independently.
+- [ ] Geyser/Floodgate are installed only if Bedrock support is desired.
+- [ ] Server restart or reload expectations are understood.
+- [ ] Rollback plan is ready.
+- [ ] Any webserver or reverse-proxy changes are reviewed by the server administrator.
+- [ ] No private values will be committed to Git or shared publicly.
 
-- [ ] Copy `<PLUGIN_JAR_PATH>` to `<PRODUCTION_SERVER_PATH>/plugins/BlueMapCommunityNames-0.2.0.jar`.
-- [ ] Start or restart server.
+## Install
+
+- [ ] Build or obtain the BlueMapCommunityNames jar.
+- [ ] Place the jar in the server `plugins/` directory.
+- [ ] Start or restart the server.
 - [ ] Confirm BlueMapCommunityNames is enabled.
 - [ ] Run `bcn status`.
-- [ ] Confirm active roster fields are the expected zero to three LuckPerms meta keys.
 - [ ] Confirm generated files exist under `plugins/BlueMapCommunityNames/web/`.
+- [ ] Confirm no BlueMapCommunityNames-owned files were created under BlueMap, LuckPerms,
+      Geyser, or Floodgate folders.
 
-## nginx
+## Configure
 
-- [ ] Add `/bcn/` alias to `<PRODUCTION_NGINX_CONFIG_PATH>`.
-- [ ] Confirm alias points to `<PRODUCTION_SERVER_PATH>/plugins/BlueMapCommunityNames/web/`.
-- [ ] Do not change existing BlueMap `/maps/*` or live proxy behavior.
-- [ ] Run nginx config test.
-- [ ] Reload nginx.
-- [ ] `curl -I <PRODUCTION_BLUEMAP_URL>/bcn/overlay.js` returns 200.
-- [ ] `curl -I <PRODUCTION_BLUEMAP_URL>/bcn/overlay.css` returns 200.
-- [ ] `curl -I <PRODUCTION_BLUEMAP_URL>/bcn/players.json` returns 200.
-- [ ] `/bcn/players.json` has `Cache-Control: no-store` or equivalent.
+- [ ] Choose zero to three LuckPerms meta keys.
+- [ ] Confirm `community_name`, `title`, and `role` are examples only.
+- [ ] Choose a display mode: `alias_as_primary`, `minecraft_id_as_primary`, or
+      `minecraft_id_only`.
+- [ ] Run `bcn reload` after config changes.
+- [ ] Run `bcn rebuild` if you need immediate JSON refresh.
 
-## LuckPerms Meta
+## Optional Web Route
 
-- [ ] Set Java player meta if needed:
-  `/lp user <JAVA_PLAYER_NAME> meta set community_name <ALIAS_SAMPLE>`
-- [ ] Set Bedrock/Floodgate player meta if needed:
-  `/lp user <BEDROCK_PLAYER_NAME> meta set community_name <BEDROCK_ALIAS_SAMPLE>`
-- [ ] If Bedrock/Floodgate prefixed username is rejected, use UUID targeting.
-- [ ] Remember Java and Bedrock/Floodgate identities may be separate LuckPerms users.
-- [ ] If using custom fields, update `player-roster.luckperms-fields.fields`, run
-  `bcn reload`, then run `bcn rebuild`.
+If your BlueMap web environment requires an explicit `/bcn/` route:
+
+- [ ] Add the route according to your own webserver/reverse-proxy environment.
+- [ ] Confirm the route points to `plugins/BlueMapCommunityNames/web/`.
+- [ ] Do not copy files into BlueMap's webRoot.
+- [ ] Confirm `/bcn/overlay.js`, `/bcn/overlay.css`, and `/bcn/players.json` return 200.
+- [ ] Confirm `players.json` uses `no-store` or equivalent short/no caching.
+
+nginx is not required by BlueMapCommunityNames; it is only one possible webserver choice.
+
+## Java Verification
+
+- [ ] Java player joins.
+- [ ] Roster shows the Java player.
+- [ ] Native BlueMap marker remains the original player identity if visible.
+- [ ] Configured alias/chips appear when LuckPerms meta exists.
+- [ ] Missing meta values are omitted safely.
+
+## Bedrock / Floodgate Verification
+
+- [ ] Bedrock player joins if Bedrock support is in scope.
+- [ ] Roster shows the Bedrock player.
+- [ ] Floodgate identity is understood for your server.
+- [ ] If username targeting fails in LuckPerms, use UUID-based targeting locally.
+- [ ] Do not publish real UUIDs.
 
 ## Browser Verification
 
-- [ ] Open `<PRODUCTION_BLUEMAP_URL>`.
-- [ ] Confirm BlueMap loads normally.
-- [ ] Confirm BlueMapCommunityNames overlay appears.
-- [ ] Confirm no UI breakage.
-- [ ] Confirm `/bcn/players.json` loads in browser.
-
-## Java Player Verification
-
-- [ ] Java player joins.
-- [ ] Native BlueMap marker remains `<JAVA_PLAYER_NAME>`.
-- [ ] Roster shows configured alias/chips when meta exists.
-- [ ] Roster falls back to `<JAVA_PLAYER_NAME>` when no configured values are present.
-- [ ] `players.json` has `bedrock:false`.
-
-## Bedrock Player Verification
-
-- [ ] Bedrock/Floodgate player joins if available.
-- [ ] Native BlueMap marker remains `<BEDROCK_PLAYER_NAME>`.
-- [ ] Roster shows configured alias/chips when meta exists.
-- [ ] Roster falls back to `<BEDROCK_PLAYER_NAME>` when no configured values are present.
-- [ ] `players.json` has `bedrock:true` when Floodgate detects Bedrock.
-
-## Post-Deploy
-
-- [ ] Run `bcn rebuild`.
-- [ ] Run `bcn status`.
-- [ ] Last error is `none`.
-- [ ] `players.json` has `schemaVersion: 2`.
-- [ ] `players.json` does not expose UUIDs by default.
-- [ ] Server log has no BlueMapCommunityNames errors.
-- [ ] No BlueMapCommunityNames-owned files under BlueMap/LuckPerms/Geyser/Floodgate folders.
-- [ ] `bluemap reload` re-registers script/style.
+- [ ] BlueMap loads normally.
+- [ ] BlueMapCommunityNames overlay appears.
+- [ ] Search works.
+- [ ] Filters work when filterable values exist.
+- [ ] Details/chips collapse works.
+- [ ] Settings and opacity work.
+- [ ] Japanese/English switch works.
+- [ ] No empty chips appear.
+- [ ] Alias/Minecraft ID is not duplicated.
 
 ## Rollback Ready
 
-- [ ] Rollback plan reviewed.
-- [ ] nginx backup available.
-- [ ] Plugin jar removal path known.
-- [ ] Plugin data folder removal path known.
-- [ ] `/bcn/` alias removal path known.
+- [ ] Plugin jar removal path is known.
+- [ ] Plugin data folder removal path is known.
+- [ ] Optional `/bcn/` route removal path is known.
+- [ ] LuckPerms test meta unset commands are known.
+- [ ] BlueMap and LuckPerms can be verified after rollback.

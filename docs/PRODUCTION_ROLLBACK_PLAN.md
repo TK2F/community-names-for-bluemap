@@ -1,61 +1,37 @@
-# Production Rollback Plan
+# Rollback Plan
+
+This rollback plan covers only BlueMapCommunityNames. It does not roll back BlueMap,
+LuckPerms, Geyser/Floodgate, webserver, firewall, TLS, DNS, or operating-system changes.
 
 ## When To Roll Back
 
-Roll back if any of these occur:
+Roll back BlueMapCommunityNames if:
 
-- BlueMapCommunityNames fails to load.
-- The overlay breaks the BlueMap browser UI.
-- The nginx `/bcn/` route or related config breaks existing BlueMap access.
-- Unexpected server errors appear after deploy.
-- `/bcn status` reports persistent JSON write errors.
+- the plugin fails to load
+- the roster overlay breaks the BlueMap browser experience
+- `/bcn status` reports persistent JSON write errors
+- the optional `/bcn/` route was added incorrectly and the overlay cannot load
+- unexpected server errors are clearly related to BlueMapCommunityNames
 
 ## Rollback Steps
 
-1. If the server is unstable or a restart is already planned, stop the server.
-2. Remove the plugin jar:
-
-```sh
-rm <PRODUCTION_SERVER_PATH>/plugins/BlueMapCommunityNames-0.2.0.jar
-```
-
-3. Remove the plugin data folder:
-
-```sh
-rm -rf <PRODUCTION_SERVER_PATH>/plugins/BlueMapCommunityNames/
-```
-
-4. Remove the nginx `/bcn/` alias from:
-
-```text
-<PRODUCTION_NGINX_CONFIG_PATH>
-```
-
-5. Test nginx config:
-
-```sh
-nginx -t -c <PRODUCTION_NGINX_CONFIG_PATH>
-```
-
-6. Reload nginx:
-
-```sh
-nginx -s reload
-```
-
-7. Start or restart the server if it was stopped.
+1. Stop the server if required by your operation policy.
+2. Remove the BlueMapCommunityNames jar from `plugins/`.
+3. Optionally remove `plugins/BlueMapCommunityNames/` after backing up any local config
+   you want to keep.
+4. Remove any optional `/bcn/` webserver/reverse-proxy route added for this plugin.
+5. Start the server if it was stopped.
+6. Verify BlueMap and LuckPerms still work normally.
 
 ## Rollback Verification
 
 Verify:
 
-- BlueMap still loads at `<PRODUCTION_BLUEMAP_URL>`.
+- BlueMap still loads.
 - LuckPerms commands and data remain unaffected.
-- `/bcn/overlay.js` is no longer served.
 - BlueMap native live markers still work.
-- Server log has no new BlueMapCommunityNames errors.
-- `plugins/BlueMapCommunityNames/` no longer exists.
-- No BlueMapCommunityNames-owned files remain under BlueMap, LuckPerms, Geyser, or
+- no BlueMapCommunityNames-owned files remain under BlueMap, LuckPerms, Geyser, or
   Floodgate folders.
 
-Rollback removes only BlueMapCommunityNames-owned files and the `/bcn/` public route.
+Rollback should remove only BlueMapCommunityNames-owned files and any optional public
+route added specifically for `/bcn/`.
