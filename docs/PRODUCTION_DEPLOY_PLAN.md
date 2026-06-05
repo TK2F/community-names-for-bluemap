@@ -147,6 +147,13 @@ Default example roster fields:
 meta-key: "community_name"
 
 player-roster:
+  name-display:
+    mode: alias_as_primary
+    show-minecraft-id-as-subtext: true
+    show-alias-as-subtext: true
+    show-alias-as-chip: false
+    minecraft-id-prefix: "@"
+
   luckperms-fields:
     max-fields: 3
     fields:
@@ -187,22 +194,26 @@ bcn rebuild
 Example commands for the default sample keys:
 
 ```text
-/lp user <JAVA_PLAYER_NAME> meta set community_name <JAVA_COMMUNITY_NAME>
-/lp user <JAVA_PLAYER_NAME> meta set title <JAVA_TITLE>
-/lp user <JAVA_PLAYER_NAME> meta set role <JAVA_ROLE>
-/lp user <BEDROCK_PLAYER_NAME> meta set community_name <BEDROCK_COMMUNITY_NAME>
-/lp user <BEDROCK_PLAYER_NAME> meta set title <BEDROCK_TITLE>
-/lp user <BEDROCK_PLAYER_NAME> meta set role <BEDROCK_ROLE>
+/lp user <JAVA_PLAYER_NAME> meta set community_name <ALIAS_SAMPLE>
+/lp user <JAVA_PLAYER_NAME> meta set title <TITLE_SAMPLE>
+/lp user <JAVA_PLAYER_NAME> meta set role <ROLE_SAMPLE>
+/lp user <BEDROCK_PLAYER_NAME> meta set community_name <BEDROCK_ALIAS_SAMPLE>
+/lp user <BEDROCK_PLAYER_NAME> meta set title <BEDROCK_TITLE_SAMPLE>
+/lp user <BEDROCK_PLAYER_NAME> meta set role <BEDROCK_ROLE_SAMPLE>
 ```
 
 Java and Bedrock/Floodgate identities may be separate LuckPerms users. Both may need
 separate meta values. Missing values are omitted safely.
 
+`player-roster.name-display.mode` controls whether the alias field or Minecraft ID is
+the main roster display. Use `alias_as_primary`, `minecraft_id_as_primary`, or
+`minecraft_id_only` according to the production server culture.
+
 If a Bedrock/Floodgate prefixed username is rejected by LuckPerms command parsing, use
 UUID targeting:
 
 ```text
-/lp user <BEDROCK_FLOODGATE_UUID> meta set community_name <BEDROCK_COMMUNITY_NAME>
+/lp user <BEDROCK_FLOODGATE_UUID> meta set community_name <BEDROCK_ALIAS_SAMPLE>
 ```
 
 ## Browser Verification
@@ -218,8 +229,8 @@ Expected:
 - BlueMap loads normally.
 - BlueMapCommunityNames overlay appears.
 - Native BlueMap marker remains `<JAVA_PLAYER_NAME>` or `<BEDROCK_PLAYER_NAME>`.
-- Roster shows the configured alias as the main name and configured chip fields when
-  those values are present.
+- Roster display matches the configured `player-roster.name-display.mode`, and configured
+  chip fields appear when those values are present.
 - If no configured values are present for a player, the roster falls back to the
   Minecraft player name.
 

@@ -53,12 +53,12 @@ Existing BlueMap `/maps/*/live/*` proxy settings should remain unchanged.
 LuckPerms example using the default sample fields:
 
 ```text
-/lp user <JAVA_PLAYER_NAME> meta set community_name <JAVA_COMMUNITY_NAME>
-/lp user <JAVA_PLAYER_NAME> meta set title <JAVA_TITLE>
-/lp user <JAVA_PLAYER_NAME> meta set role <JAVA_ROLE>
-/lp user <BEDROCK_FLOODGATE_UUID> meta set community_name <BEDROCK_COMMUNITY_NAME>
-/lp user <BEDROCK_FLOODGATE_UUID> meta set title <BEDROCK_TITLE>
-/lp user <BEDROCK_FLOODGATE_UUID> meta set role <BEDROCK_ROLE>
+/lp user <JAVA_PLAYER_NAME> meta set community_name <ALIAS_SAMPLE>
+/lp user <JAVA_PLAYER_NAME> meta set title <TITLE_SAMPLE>
+/lp user <JAVA_PLAYER_NAME> meta set role <ROLE_SAMPLE>
+/lp user <BEDROCK_FLOODGATE_UUID> meta set community_name <BEDROCK_ALIAS_SAMPLE>
+/lp user <BEDROCK_FLOODGATE_UUID> meta set title <BEDROCK_TITLE_SAMPLE>
+/lp user <BEDROCK_FLOODGATE_UUID> meta set role <BEDROCK_ROLE_SAMPLE>
 ```
 
 `community_name`, `title`, and `role` are examples only. Server owners can configure
@@ -66,10 +66,31 @@ zero to three arbitrary LuckPerms meta keys. With zero fields, the roster shows 
 IDs only and has no LuckPerms filters. Alias and chip fields are optional, and missing,
 blank, or sanitized-empty values are omitted safely.
 
+Roster name display is controlled separately from which LuckPerms keys are read:
+
+- `alias_as_primary`: show the configured alias field as the main name when present,
+  fall back to the Minecraft ID, and optionally show `@minecraft_id` as subtext.
+- `minecraft_id_as_primary`: always show the Minecraft ID as the main name, and
+  optionally show the alias as subtext or a chip.
+- `minecraft_id_only`: always show the Minecraft ID as the main name. Alias values are
+  hidden unless `show-alias-as-chip` is explicitly enabled.
+
+If an alias is missing, blank, sanitized empty, or equal to the Minecraft ID after
+normalization, the UI avoids empty or duplicate subtext and chips. Search still includes
+the present searchable meta values. Filters are built only from configured filterable
+fields that currently have online values.
+
 ```yaml
 meta-key: "community_name"
 
 player-roster:
+  name-display:
+    mode: alias_as_primary
+    show-minecraft-id-as-subtext: true
+    show-alias-as-subtext: true
+    show-alias-as-chip: false
+    minecraft-id-prefix: "@"
+
   details:
     default-state: expanded
     allow-toggle: true

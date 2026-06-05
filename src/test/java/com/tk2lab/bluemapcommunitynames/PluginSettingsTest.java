@@ -132,6 +132,112 @@ class PluginSettingsTest {
     }
 
     @Test
+    void nameDisplayModesAndAliasControlsAreParsed() {
+        PluginSettings settings = settings("""
+                player-roster:
+                  name-display:
+                    mode: minecraft_id_as_primary
+                    show-minecraft-id-as-subtext: false
+                    show-alias-as-subtext: false
+                    show-alias-as-chip: true
+                  luckperms-fields:
+                    fields:
+                      - id: alias
+                        meta-key: alias_key
+                        label: "Alias"
+                        display: alias
+                """);
+
+        assertEquals("minecraft_id_as_primary", settings.display().nameDisplayMode());
+        assertEquals(false, settings.display().showMinecraftIdAsSubtext());
+        assertEquals(false, settings.display().showAliasAsSubtext());
+        assertEquals(true, settings.display().showAliasAsChip());
+    }
+
+    @Test
+    void legacyCommunityNameModeMapsToAliasAsPrimary() {
+        PluginSettings settings = settings("""
+                player-roster:
+                  name-display:
+                    mode: community_name_as_primary
+                  luckperms-fields:
+                    fields: []
+                """);
+
+        assertEquals("alias_as_primary", settings.display().nameDisplayMode());
+        assertTrue(settings.warnings().stream().anyMatch(value -> value.contains("legacy community_name_as_primary")));
+    }
+
+    @Test
+    void invalidNameDisplayModeFallsBackToAliasAsPrimary() {
+        PluginSettings settings = settings("""
+                player-roster:
+                  name-display:
+                    mode: " "
+                  luckperms-fields:
+                    fields: []
+                """);
+
+        assertEquals("alias_as_primary", settings.display().nameDisplayMode());
+    }
+
+    @Test
+    void rosterFieldCountsSupportZeroOneTwoAndThreeFields() {
+        assertEquals(0, keys(settings("""
+                player-roster:
+                  luckperms-fields:
+                    fields: []
+                """)).size());
+        assertEquals(1, keys(settings("""
+                player-roster:
+                  luckperms-fields:
+                    fields:
+                      - meta-key: alias_key
+                        display: alias
+                """)).size());
+        assertEquals(2, keys(settings("""
+                player-roster:
+                  luckperms-fields:
+                    fields:
+                      - meta-key: alias_key
+                        display: alias
+                      - meta-key: guild_key
+                        display: chip
+                """)).size());
+        assertEquals(3, keys(settings("""
+                player-roster:
+                  luckperms-fields:
+                    fields:
+                      - meta-key: alias_key
+                        display: alias
+                      - meta-key: guild_key
+                        display: chip
+                      - meta-key: role_key
+                        display: chip
+                """)).size());
+    }
+
+    @Test
+    void moreThanThreeRosterFieldsAreTruncatedWithWarning() {
+        PluginSettings settings = settings("""
+                player-roster:
+                  luckperms-fields:
+                    fields:
+                      - meta-key: alias_key
+                        display: alias
+                      - meta-key: guild_key
+                        display: chip
+                      - meta-key: role_key
+                        display: chip
+                      - meta-key: extra_key
+                        display: chip
+                """);
+
+        assertEquals(List.of("alias_key", "guild_key", "role_key"), keys(settings));
+        assertTrue(settings.warnings().stream().anyMatch(value -> value.contains("More than 3 roster fields")));
+    }
+
+    @Test
     void invalidOnlyRosterFieldsAreSafeMinecraftIdOnlyMode() {
         PluginSettings settings = settings("""
                 player-roster:

@@ -139,10 +139,10 @@ public record PluginSettings(
                         Math.max(1, config.getInt("player-roster.panel.max-height-vh", 70))
                 ),
                 new RosterNameDisplaySettings(
-                        normalizeChoice(config.getString("player-roster.name-display.mode", "community_name_as_primary"),
-                                Set.of("community_name_as_primary", "minecraft_id_as_primary", "minecraft_id_only"),
-                                "community_name_as_primary", "player-roster.name-display.mode", warnings),
+                        normalizeNameDisplayMode(config.getString("player-roster.name-display.mode", "alias_as_primary"), warnings),
                         config.getBoolean("player-roster.name-display.show-minecraft-id-as-subtext", true),
+                        config.getBoolean("player-roster.name-display.show-alias-as-subtext", true),
+                        config.getBoolean("player-roster.name-display.show-alias-as-chip", false),
                         config.getString("player-roster.name-display.minecraft-id-prefix", "@")
                 ),
                 new RosterSearchSettings(
@@ -253,6 +253,8 @@ public record PluginSettings(
                 roster.fallbackUsed(),
                 roster.nameDisplay().mode(),
                 roster.nameDisplay().showMinecraftIdAsSubtext(),
+                roster.nameDisplay().showAliasAsSubtext(),
+                roster.nameDisplay().showAliasAsChip(),
                 roster.nameDisplay().minecraftIdPrefix()
         );
     }
@@ -322,6 +324,22 @@ public record PluginSettings(
         return defaultValue;
     }
 
+    private static String normalizeNameDisplayMode(String value, List<String> warnings) {
+        if (value == null || value.isBlank()) {
+            return "alias_as_primary";
+        }
+        String normalized = value.trim();
+        if ("community_name_as_primary".equals(normalized)) {
+            warnings.add("Config value player-roster.name-display.mode uses legacy community_name_as_primary; treating it as alias_as_primary.");
+            return "alias_as_primary";
+        }
+        return normalizeChoice(normalized,
+                Set.of("alias_as_primary", "minecraft_id_as_primary", "minecraft_id_only"),
+                "alias_as_primary",
+                "player-roster.name-display.mode",
+                warnings);
+    }
+
     private static Normalizer.Form parseNormalize(String value) {
         if (value == null || value.isBlank() || "NONE".equalsIgnoreCase(value)) {
             return null;
@@ -336,6 +354,8 @@ public record PluginSettings(
             boolean fallbackUsed,
             String nameDisplayMode,
             boolean showMinecraftIdAsSubtext,
+            boolean showAliasAsSubtext,
+            boolean showAliasAsChip,
             String minecraftIdPrefix
     ) {
         public DisplaySettings {
@@ -343,7 +363,12 @@ public record PluginSettings(
         }
 
         public DisplaySettings(String separator, int maxFields, List<DisplayField> fields, boolean fallbackUsed) {
-            this(separator, maxFields, fields, fallbackUsed, "community_name_as_primary", true, "@");
+            this(separator, maxFields, fields, fallbackUsed, "alias_as_primary", true, true, false, "@");
+        }
+
+        public DisplaySettings(String separator, int maxFields, List<DisplayField> fields, boolean fallbackUsed,
+                               String nameDisplayMode, boolean showMinecraftIdAsSubtext, String minecraftIdPrefix) {
+            this(separator, maxFields, fields, fallbackUsed, nameDisplayMode, showMinecraftIdAsSubtext, true, false, minecraftIdPrefix);
         }
     }
 
@@ -374,6 +399,8 @@ public record PluginSettings(
     public record RosterNameDisplaySettings(
             String mode,
             boolean showMinecraftIdAsSubtext,
+            boolean showAliasAsSubtext,
+            boolean showAliasAsChip,
             String minecraftIdPrefix
     ) {
     }

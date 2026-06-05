@@ -11,8 +11,14 @@ player-roster:
     max-height-vh: 70
 
   name-display:
-    mode: community_name_as_primary
+    # mode:
+    #   alias_as_primary        -> alias meta value first, Minecraft ID as subtext when present
+    #   minecraft_id_as_primary -> Minecraft ID first, alias as subtext when present
+    #   minecraft_id_only       -> Minecraft ID first; alias is hidden unless show-alias-as-chip is true
+    mode: alias_as_primary
     show-minecraft-id-as-subtext: true
+    show-alias-as-subtext: true
+    show-alias-as-chip: false
     minecraft-id-prefix: "@"
 
   search:
@@ -36,7 +42,7 @@ player-roster:
   luckperms-fields:
     # community_name / title / role はサンプルです。サーバーの LuckPerms meta key に置き換えてください。
     # 0 から 3 個まで設定できます。fields: [] にすると Minecraft ID だけの名簿になります。
-    # display: alias はメイン表示名、display: chip はタグ風の値です。
+    # display: alias は name-display.mode に従う別名フィールド、display: chip はタグ風の値です。
     # searchable は検索対象にするか、filterable は Filters UI に出すかを制御します。
     max-fields: 3
     fields:

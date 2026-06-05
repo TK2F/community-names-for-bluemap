@@ -79,6 +79,10 @@ class JsonSerializationTest {
 
         assertEquals("collapsed", details.get("defaultState").getAsString());
         assertTrue(details.get("allowToggle").getAsBoolean());
+        assertEquals("alias_as_primary", json.getAsJsonObject("roster").get("nameDisplayMode").getAsString());
+        assertTrue(json.getAsJsonObject("roster").get("showMinecraftIdAsSubtext").getAsBoolean());
+        assertTrue(json.getAsJsonObject("roster").get("showAliasAsSubtext").getAsBoolean());
+        assertFalse(json.getAsJsonObject("roster").get("showAliasAsChip").getAsBoolean());
         assertEquals(8, filters.get("maxVisibleValuesPerField").getAsInt());
         assertEquals(12, filters.get("highCardinalityThreshold").getAsInt());
         assertEquals("CommunityName", player.get("displayName").getAsString());
@@ -98,8 +102,10 @@ class JsonSerializationTest {
                         3,
                         List.of(),
                         false,
-                        "community_name_as_primary",
+                        "alias_as_primary",
                         true,
+                        true,
+                        false,
                         "@"
                 ),
                 new PluginSettings.RosterDetailsSettings("expanded", true),
@@ -161,8 +167,10 @@ class JsonSerializationTest {
                         new PluginSettings.DisplayField("role", "role", "Role", "chip", true, false, true)
                 ),
                 false,
-                "community_name_as_primary",
+                "alias_as_primary",
                 true,
+                true,
+                false,
                 "@"
         );
     }

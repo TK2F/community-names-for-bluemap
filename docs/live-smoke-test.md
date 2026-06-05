@@ -120,18 +120,18 @@ choose any zero to three LuckPerms meta keys.
 With Java player `<JAVA_PLAYER_NAME>` online, set:
 
 ```text
-/lp user <JAVA_PLAYER_NAME> meta set community_name <JAVA_COMMUNITY_NAME>
-/lp user <JAVA_PLAYER_NAME> meta set title <JAVA_TITLE>
-/lp user <JAVA_PLAYER_NAME> meta set role <JAVA_ROLE>
+/lp user <JAVA_PLAYER_NAME> meta set community_name <ALIAS_SAMPLE>
+/lp user <JAVA_PLAYER_NAME> meta set title <TITLE_SAMPLE>
+/lp user <JAVA_PLAYER_NAME> meta set role <ROLE_SAMPLE>
 /bcn rebuild
 ```
 
 With Bedrock/Floodgate player `<BEDROCK_PLAYER_NAME>` online, first try:
 
 ```text
-/lp user <BEDROCK_PLAYER_NAME> meta set community_name <BEDROCK_COMMUNITY_NAME>
-/lp user <BEDROCK_PLAYER_NAME> meta set title <BEDROCK_TITLE>
-/lp user <BEDROCK_PLAYER_NAME> meta set role <BEDROCK_ROLE>
+/lp user <BEDROCK_PLAYER_NAME> meta set community_name <BEDROCK_ALIAS_SAMPLE>
+/lp user <BEDROCK_PLAYER_NAME> meta set title <BEDROCK_TITLE_SAMPLE>
+/lp user <BEDROCK_PLAYER_NAME> meta set role <BEDROCK_ROLE_SAMPLE>
 /bcn rebuild
 ```
 
@@ -139,9 +139,9 @@ If `<BEDROCK_PLAYER_NAME>` is rejected because of username syntax, use the
 Floodgate/LuckPerms UUID observed during the smoke test:
 
 ```text
-/lp user <BEDROCK_FLOODGATE_UUID> meta set community_name <BEDROCK_COMMUNITY_NAME>
-/lp user <BEDROCK_FLOODGATE_UUID> meta set title <BEDROCK_TITLE>
-/lp user <BEDROCK_FLOODGATE_UUID> meta set role <BEDROCK_ROLE>
+/lp user <BEDROCK_FLOODGATE_UUID> meta set community_name <BEDROCK_ALIAS_SAMPLE>
+/lp user <BEDROCK_FLOODGATE_UUID> meta set title <BEDROCK_TITLE_SAMPLE>
+/lp user <BEDROCK_FLOODGATE_UUID> meta set role <BEDROCK_ROLE_SAMPLE>
 /bcn rebuild
 ```
 
@@ -154,8 +154,9 @@ Wait up to 10 seconds, or run:
 Check:
 
 - BlueMap native map markers still display `<JAVA_PLAYER_NAME>` and `<BEDROCK_PLAYER_NAME>`.
-- The independent roster displays the alias as the main name, Minecraft ID as subtext,
-  and title/role as chips when those values are present.
+- The independent roster display matches `player-roster.name-display.mode`: alias primary,
+  Minecraft ID primary with alias subtext/chip, or Minecraft-ID-only. Title/role chips
+  appear when those values are present and configured.
 - `players.json` has `schemaVersion: 2` and contains `playerName`, `minecraftId`,
   `displayName`, `subName`, `display`, `bedrock`, `chips`, `metaValues`, and `filterText`.
 - `players.json` does not contain UUIDs.
@@ -207,9 +208,9 @@ player-roster:
 Set all configured keys:
 
 ```text
-/lp user <JAVA_PLAYER_NAME> meta set community_name <JAVA_COMMUNITY_NAME>
-/lp user <JAVA_PLAYER_NAME> meta set title <JAVA_TITLE>
-/lp user <JAVA_PLAYER_NAME> meta set role <JAVA_ROLE>
+/lp user <JAVA_PLAYER_NAME> meta set community_name <ALIAS_SAMPLE>
+/lp user <JAVA_PLAYER_NAME> meta set title <TITLE_SAMPLE>
+/lp user <JAVA_PLAYER_NAME> meta set role <ROLE_SAMPLE>
 /bcn reload
 /bcn rebuild
 ```
@@ -220,18 +221,18 @@ Expected `players.json` entry while `<JAVA_PLAYER_NAME>` is online:
 {
   "playerName": "<JAVA_PLAYER_NAME>",
   "minecraftId": "<JAVA_PLAYER_NAME>",
-  "displayName": "<JAVA_COMMUNITY_NAME>",
+  "displayName": "<ALIAS_SAMPLE>",
   "subName": "@<JAVA_PLAYER_NAME>",
-  "display": "<JAVA_COMMUNITY_NAME>",
+  "display": "<ALIAS_SAMPLE>",
   "bedrock": false,
   "chips": [
-    {"id": "title", "key": "title", "label": "称号", "display": "chip", "value": "<JAVA_TITLE>"},
-    {"id": "role", "key": "role", "label": "ロール", "display": "chip", "value": "<JAVA_ROLE>"}
+    {"id": "title", "key": "title", "label": "称号", "display": "chip", "value": "<TITLE_SAMPLE>"},
+    {"id": "role", "key": "role", "label": "ロール", "display": "chip", "value": "<ROLE_SAMPLE>"}
   ],
   "metaValues": [
-    {"id": "community_name", "key": "community_name", "label": "よび名", "display": "alias", "value": "<JAVA_COMMUNITY_NAME>"},
-    {"id": "title", "key": "title", "label": "称号", "display": "chip", "value": "<JAVA_TITLE>"},
-    {"id": "role", "key": "role", "label": "ロール", "display": "chip", "value": "<JAVA_ROLE>"}
+    {"id": "community_name", "key": "community_name", "label": "よび名", "display": "alias", "value": "<ALIAS_SAMPLE>"},
+    {"id": "title", "key": "title", "label": "称号", "display": "chip", "value": "<TITLE_SAMPLE>"},
+    {"id": "role", "key": "role", "label": "ロール", "display": "chip", "value": "<ROLE_SAMPLE>"}
   ]
 }
 ```
@@ -307,8 +308,8 @@ clean-ownership checks before asking the owner to perform these manual phases.
 - BlueMap proxy URL: `http://<TEST_SERVER_HOST>:<TEST_PROXY_PORT>/`
 - Action: connect as `<JAVA_PLAYER_NAME>` from a Java client, then open the BlueMap URL.
 - Expected native marker text: `<JAVA_PLAYER_NAME>`
-- Expected roster: alias `<JAVA_COMMUNITY_NAME>`, subtext `@<JAVA_PLAYER_NAME>`, and
-  chips for `<JAVA_TITLE>` and `<JAVA_ROLE>` when those values are present.
+- Expected roster: alias `<ALIAS_SAMPLE>`, subtext `@<JAVA_PLAYER_NAME>`, and
+  chips for `<TITLE_SAMPLE>` and `<ROLE_SAMPLE>` when those values are present.
 - Report back: whether the native marker stayed unchanged, whether the roster matched,
   and whether the overlay panel appeared without breaking BlueMap controls.
 
@@ -318,8 +319,8 @@ clean-ownership checks before asking the owner to perform these manual phases.
 - BlueMap proxy URL: `http://<TEST_SERVER_HOST>:<TEST_PROXY_PORT>/`
 - Action: connect as `<BEDROCK_PLAYER_NAME>` from a Bedrock client, then open the BlueMap URL.
 - Expected native marker text: `<BEDROCK_PLAYER_NAME>`
-- Expected roster: alias `<BEDROCK_COMMUNITY_NAME>`, subtext `@<BEDROCK_PLAYER_NAME>`,
-  and chips for `<BEDROCK_TITLE>` and `<BEDROCK_ROLE>` when those values are present.
+- Expected roster: alias `<BEDROCK_ALIAS_SAMPLE>`, subtext `@<BEDROCK_PLAYER_NAME>`,
+  and chips for `<BEDROCK_TITLE_SAMPLE>` and `<BEDROCK_ROLE_SAMPLE>` when those values are present.
 - Report back: whether the native marker stayed unchanged, whether the roster matched,
   and whether Bedrock appears in the independent overlay.
 

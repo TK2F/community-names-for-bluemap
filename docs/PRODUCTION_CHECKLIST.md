@@ -37,9 +37,9 @@
 ## LuckPerms Meta
 
 - [ ] Set Java player meta if needed:
-  `/lp user <JAVA_PLAYER_NAME> meta set community_name <JAVA_COMMUNITY_NAME>`
+  `/lp user <JAVA_PLAYER_NAME> meta set community_name <ALIAS_SAMPLE>`
 - [ ] Set Bedrock/Floodgate player meta if needed:
-  `/lp user <BEDROCK_PLAYER_NAME> meta set community_name <BEDROCK_COMMUNITY_NAME>`
+  `/lp user <BEDROCK_PLAYER_NAME> meta set community_name <BEDROCK_ALIAS_SAMPLE>`
 - [ ] If Bedrock/Floodgate prefixed username is rejected, use UUID targeting.
 - [ ] Remember Java and Bedrock/Floodgate identities may be separate LuckPerms users.
 - [ ] If using custom fields, update `player-roster.luckperms-fields.fields`, run

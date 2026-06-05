@@ -245,10 +245,20 @@ luckPerms.getPlayerAdapter(Player.class).getMetaData(player).getMetaValue(metaKe
   `department`, `event_rank`, or `class_name` must work.
 - Active roster fields are read from `player-roster.luckperms-fields.fields`.
 - Explicit empty `player-roster.luckperms-fields.fields` means Minecraft-ID-only roster.
+- `player-roster.name-display.mode` controls how the alias field affects row names:
+  - `alias_as_primary`: alias is the main row name when present; Minecraft ID is the
+    fallback and may be shown as prefixed subtext.
+  - `minecraft_id_as_primary`: Minecraft ID is always the main row name; alias may be
+    shown as subtext or, if explicitly configured, as a chip.
+  - `minecraft_id_only`: Minecraft ID is always the main row name; alias is hidden unless
+    `show-alias-as-chip` is explicitly enabled.
+- Alias values that are missing, null, blank, sanitized empty, or equal to the Minecraft
+  ID after normalization must not create empty or duplicate subtext/chips.
 - If roster fields are missing but old v0.2 `display.fields` exists, adapt those fields.
 - If roster fields and `display.fields` are missing but old v0.1 `meta-key` exists,
   convert `meta-key` into one alias field.
 - If no roster/display/meta-key config exists, use the default example fields.
+- Legacy `community_name_as_primary` configs are accepted as `alias_as_primary`.
 - Blank keys are skipped with a warning, duplicate keys are deduped with a warning, and
   more than three enabled fields are truncated with a warning.
 - Blank labels fall back to the key.
@@ -355,8 +365,10 @@ Schema:
     ]
   },
   "roster": {
-    "nameDisplayMode": "community_name_as_primary",
+    "nameDisplayMode": "alias_as_primary",
     "showMinecraftIdAsSubtext": true,
+    "showAliasAsSubtext": true,
+    "showAliasAsChip": false,
     "minecraftIdPrefix": "@",
     "fields": [
       {"id": "community_name", "key": "community_name", "label": "よび名", "display": "alias", "searchable": true, "filterable": true}
@@ -364,20 +376,20 @@ Schema:
   },
   "players": [
     {
-      "playerName": "<JAVA_PLAYER_NAME>",
-      "minecraftId": "<JAVA_PLAYER_NAME>",
-      "displayName": "<JAVA_COMMUNITY_NAME>",
-      "subName": "@<JAVA_PLAYER_NAME>",
-      "display": "<JAVA_COMMUNITY_NAME>",
+      "playerName": "player_alpha",
+      "minecraftId": "player_alpha",
+      "displayName": "Alias Alpha",
+      "subName": "@player_alpha",
+      "display": "player_alpha/Alias Alpha/Role Sample",
       "bedrock": false,
       "chips": [
-        {"id": "title", "key": "title", "label": "称号", "display": "chip", "searchable": false, "filterable": true, "value": "<JAVA_TITLE>"}
+        {"id": "title", "key": "title", "label": "称号", "display": "chip", "searchable": false, "filterable": true, "value": "Role Sample"}
       ],
       "metaValues": [
-        {"id": "community_name", "key": "community_name", "label": "よび名", "display": "alias", "searchable": true, "filterable": true, "value": "<JAVA_COMMUNITY_NAME>"},
-        {"id": "title", "key": "title", "label": "称号", "display": "chip", "searchable": false, "filterable": true, "value": "<JAVA_TITLE>"}
+        {"id": "community_name", "key": "community_name", "label": "よび名", "display": "alias", "searchable": true, "filterable": true, "value": "Alias Alpha"},
+        {"id": "title", "key": "title", "label": "称号", "display": "chip", "searchable": false, "filterable": true, "value": "Role Sample"}
       ],
-      "filterText": "<JAVA_PLAYER_NAME> <JAVA_COMMUNITY_NAME> <JAVA_TITLE>"
+      "filterText": "player_alpha player_alpha/Alias Alpha/Role Sample Alias Alpha @player_alpha Alias Alpha"
     }
   ]
 }
@@ -392,6 +404,8 @@ Rules:
 - `display.fields` lists configured fields visible to the overlay.
 - `roster.fields` lists configured roster fields visible to the overlay.
 - `displayName`, `subName`, and `chips` support roster rendering.
+- `nameDisplayMode` is one of `alias_as_primary`, `minecraft_id_as_primary`, or
+  `minecraft_id_only`.
 - `metaValues` contains only present sanitized values.
 - Missing, null, blank, and sanitized-empty values are omitted.
 - `display` is final UI string.
@@ -462,8 +476,10 @@ player-roster:
     max-height: 520px
     max-height-vh: 70
   name-display:
-    mode: community_name_as_primary
+    mode: alias_as_primary
     show-minecraft-id-as-subtext: true
+    show-alias-as-subtext: true
+    show-alias-as-chip: false
     minecraft-id-prefix: "@"
   search:
     enabled: true
@@ -573,7 +589,7 @@ README must explain:
 - LuckPerms meta example:
 
 ```text
-/lp user <JAVA_PLAYER_NAME> meta set community_name <JAVA_COMMUNITY_NAME>
+/lp user <JAVA_PLAYER_NAME> meta set community_name <ALIAS_SAMPLE>
 ```
 
 - Uninstall steps:
@@ -611,13 +627,25 @@ Display resolver:
 - three meta values -> playerName/value1/value2/value3
 - missing middle value does not create double separators
 - sanitized-empty meta value is omitted
+- `alias_as_primary` uses alias as main display, falls back to Minecraft ID, and avoids
+  duplicate Minecraft ID subtext
+- `minecraft_id_as_primary` keeps Minecraft ID as main display and can show alias as
+  subtext or chip according to config
+- `minecraft_id_only` keeps Minecraft ID as main display and hides alias unless alias
+  chip display is explicitly enabled
+- alias equal to Minecraft ID after normalization is not duplicated
+- Java and Bedrock/Floodgate-style names are resolved as separate player identities
 
 Config parser:
 
 - old `meta-key` only
 - explicit empty `player-roster.luckperms-fields.fields` -> zero fields
+- one, two, and three roster fields
 - arbitrary roster keys such as `guild_name` and `event_rank`
 - `display.fields` wins over `meta-key`
+- name display mode parser accepts `alias_as_primary`, `minecraft_id_as_primary`, and
+  `minecraft_id_only`
+- legacy `community_name_as_primary` maps to `alias_as_primary`
 - blank keys skipped
 - duplicate keys deduped
 - more than three enabled fields truncated
@@ -653,7 +681,9 @@ File publisher:
 - nginx `/bcn/overlay.js` returns 200.
 - nginx `/bcn/players.json` returns 200 and `Cache-Control: no-store`.
 - BlueMap native marker still shows `<JAVA_PLAYER_NAME>`.
-- Overlay roster shows configured alias/chips when LuckPerms meta exists.
+- Overlay roster can show configured alias as main display with Minecraft ID subtext.
+- Overlay roster can keep Minecraft ID as main display with alias subtext/chip.
+- Overlay roster can run in Minecraft-ID-only mode.
 - Overlay roster shows `<JAVA_PLAYER_NAME>` when no configured meta values are present.
 - Details toggle collapses and expands player chips without hiding player names.
 - Browser-local opacity, density, and UI language settings persist across reload.

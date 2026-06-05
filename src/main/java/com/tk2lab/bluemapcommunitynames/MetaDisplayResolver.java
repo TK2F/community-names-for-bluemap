@@ -1,5 +1,6 @@
 package com.tk2lab.bluemapcommunitynames;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -59,26 +60,51 @@ public final class MetaDisplayResolver {
                 .map(ResolvedMetaValue::value)
                 .findFirst()
                 .orElse(null);
+        boolean aliasDuplicatesMinecraftId = sameDisplayValue(alias, playerName);
 
-        List<ResolvedMetaValue> chips = metaValues.stream()
-                .filter(metaValue -> "minecraft_id_only".equals(mode) || !"alias".equals(metaValue.display()))
-                .toList();
+        List<ResolvedMetaValue> chips = new ArrayList<>();
 
         String displayName;
         String subName = null;
         if ("minecraft_id_as_primary".equals(mode)) {
             displayName = playerName;
-            subName = alias;
+            if (displaySettings.showAliasAsSubtext() && !aliasDuplicatesMinecraftId) {
+                subName = alias;
+            }
+            chips.addAll(chips(metaValues, displaySettings.showAliasAsChip(), displayName, subName));
         } else if ("minecraft_id_only".equals(mode)) {
             displayName = playerName;
+            chips.addAll(chips(metaValues, displaySettings.showAliasAsChip(), displayName, subName));
         } else {
-            displayName = alias == null || alias.isBlank() ? playerName : alias;
-            if (alias != null && !alias.isBlank() && displaySettings.showMinecraftIdAsSubtext()) {
-                displaySettings.minecraftIdPrefix();
+            displayName = alias == null || alias.isBlank() || aliasDuplicatesMinecraftId ? playerName : alias;
+            if (!aliasDuplicatesMinecraftId && alias != null && !alias.isBlank() && displaySettings.showMinecraftIdAsSubtext()) {
                 subName = displaySettings.minecraftIdPrefix() + playerName;
             }
+            chips.addAll(chips(metaValues, false, displayName, subName));
         }
         return new RosterNames(displayName, subName, chips);
+    }
+
+    private static List<ResolvedMetaValue> chips(List<ResolvedMetaValue> metaValues, boolean includeAlias, String displayName, String subName) {
+        return metaValues.stream()
+                .filter(metaValue -> includeAlias || !"alias".equals(metaValue.display()))
+                .filter(metaValue -> !sameDisplayValue(metaValue.value(), displayName))
+                .filter(metaValue -> !sameDisplayValue(metaValue.value(), subName))
+                .toList();
+    }
+
+    private static boolean sameDisplayValue(String left, String right) {
+        String normalizedLeft = normalizeDisplayValue(left);
+        String normalizedRight = normalizeDisplayValue(right);
+        return normalizedLeft != null && normalizedRight != null && normalizedLeft.equalsIgnoreCase(normalizedRight);
+    }
+
+    private static String normalizeDisplayValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        String normalized = Normalizer.normalize(value.trim(), Normalizer.Form.NFC);
+        return normalized.isBlank() ? null : normalized;
     }
 
     private static String filterText(String playerName, String display, String displayName, String subName, List<ResolvedMetaValue> metaValues) {

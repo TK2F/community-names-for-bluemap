@@ -83,6 +83,8 @@ public record PlayersDocument(
     public record RosterDocument(
             String nameDisplayMode,
             boolean showMinecraftIdAsSubtext,
+            boolean showAliasAsSubtext,
+            boolean showAliasAsChip,
             String minecraftIdPrefix,
             DetailsDocument details,
             FilterSettingsDocument filters,
@@ -96,6 +98,8 @@ public record PlayersDocument(
             return new RosterDocument(
                     settings.nameDisplayMode(),
                     settings.showMinecraftIdAsSubtext(),
+                    settings.showAliasAsSubtext(),
+                    settings.showAliasAsChip(),
                     settings.minecraftIdPrefix(),
                     DetailsDocument.from(details),
                     FilterSettingsDocument.from(filters),
