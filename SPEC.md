@@ -1,9 +1,9 @@
-# BlueMapCommunityNames Specification
+# CommunityNames for BlueMap Specification
 
 ## Status
 
-This document describes the intended behavior and support boundary for
-BlueMapCommunityNames.
+This document describes the intended behavior and support boundary for BlueMapCommunityNames,
+published publicly as CommunityNames for BlueMap.
 
 ## Mission
 
@@ -216,6 +216,6 @@ That is a tested environment note, not a deployment requirement.
 ## Credits and Attribution
 
 BlueMapCommunityNames is independent and is not affiliated with, endorsed by, or
-supported by BlueMap, LuckPerms, Geyser, or Floodgate. Public release docs should thank
-those maintainers and contributors and verify upstream licenses from official sources
-before release.
+supported by Mojang, Microsoft, Minecraft, BlueMap, LuckPerms, Geyser, or Floodgate.
+Public release docs should thank those maintainers and contributors and verify upstream
+licenses from official sources before release.

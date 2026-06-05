@@ -2,7 +2,7 @@
 
 ## Tested Scope
 
-BlueMapCommunityNames has been validated with:
+BlueMapCommunityNames, published as CommunityNames for BlueMap, has been validated with:
 
 - Paper 26.1.2
 - Java 25

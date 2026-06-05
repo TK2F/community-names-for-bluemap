@@ -1,6 +1,7 @@
 # Installation
 
-BlueMapCommunityNames is installed as a normal Paper plugin.
+BlueMapCommunityNames, published as CommunityNames for BlueMap, is installed as a normal
+Paper plugin.
 
 ## Requirements
 

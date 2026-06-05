@@ -1,9 +1,9 @@
-# BlueMapCommunityNames
+# CommunityNames for BlueMap
 
-BlueMapCommunityNames is an independent Paper plugin that adds a lightweight player
-roster overlay to the BlueMap web app. It reads configured LuckPerms meta values for
-online players and publishes plugin-owned JSON, JavaScript, and CSS assets for the
-browser overlay.
+BlueMapCommunityNames, published as CommunityNames for BlueMap, is an independent Paper
+plugin that adds a lightweight player roster overlay to the BlueMap web app. It reads
+configured LuckPerms meta values for online players and publishes plugin-owned JSON,
+JavaScript, and CSS assets for the browser overlay.
 
 The plugin does not change BlueMap native marker names, hide markers, replace markers,
 rewrite BlueMap's player-list DOM, or write into BlueMap or LuckPerms folders.
@@ -175,6 +175,6 @@ LuckPerms folders.
 
 Thanks to the maintainers and contributors of BlueMap, LuckPerms, Geyser, and Floodgate.
 BlueMapCommunityNames is an independent plugin and is not affiliated with, endorsed by,
-or supported by those projects.
+or supported by Mojang, Microsoft, Minecraft, BlueMap, LuckPerms, Geyser, or Floodgate.
 
 Before a public release, verify upstream dependency licenses from official sources.
