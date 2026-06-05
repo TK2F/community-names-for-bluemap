@@ -114,6 +114,9 @@ See:
 
 Security policy: see [SECURITY.md](SECURITY.md).
 
+Third-party notices and dependency boundary: see
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
 ## Roster Configuration
 
 `community_name`, `title`, and `role` are sample defaults only. Server owners can
