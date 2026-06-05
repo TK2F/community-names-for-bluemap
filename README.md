@@ -112,6 +112,8 @@ See:
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [Compatibility](docs/COMPATIBILITY.md)
 
+Security policy: see [SECURITY.md](SECURITY.md).
+
 ## Roster Configuration
 
 `community_name`, `title`, and `role` are sample defaults only. Server owners can
