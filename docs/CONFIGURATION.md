@@ -8,6 +8,23 @@ plugins/BlueMapCommunityNames/config.yml
 
 Do not commit server-specific config containing private values.
 
+## Data Flow
+
+```mermaid
+flowchart LR
+    Admin["Server admin<br/>chooses fields + display mode"] --> Config["plugins/BlueMapCommunityNames/config.yml"]
+    Config --> Resolver["BlueMapCommunityNames resolver"]
+    LP["LuckPerms meta<br/>server-managed"] --> Resolver
+    Resolver --> Display["Resolved displayName / subName / chips"]
+    Display --> JSON["players.json<br/>plugin-owned"]
+    Assets["overlay.js / overlay.css<br/>plugin-owned"] --> Browser["Browser roster overlay"]
+    JSON --> Browser
+    BM["BlueMap native markers"] -. "unchanged" .-> Browser
+```
+
+The plugin reads configured values and publishes its own roster data. It does not edit
+LuckPerms data, BlueMap native markers, or BlueMap folders.
+
 ## Display Modes
 
 `player-roster.name-display.mode` supports:

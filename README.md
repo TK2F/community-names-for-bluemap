@@ -45,6 +45,30 @@ Server administrators are responsible for installing, configuring, operating, an
 reviewing BlueMap, LuckPerms, Geyser/Floodgate, and any network/proxy infrastructure
 according to their own environment and those projects' documentation.
 
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph Server["Paper-compatible server"]
+        LP["LuckPerms<br/>installed separately"]
+        BM["BlueMap<br/>installed separately"]
+        BCN["BlueMapCommunityNames<br/>CommunityNames for BlueMap"]
+        WEB["Plugin-owned web files<br/>overlay.js / overlay.css / players.json"]
+
+        LP -->|"configured meta values"| BCN
+        BCN -->|"writes only under<br/>plugins/BlueMapCommunityNames/"| WEB
+        BCN -->|"registers overlay paths"| BM
+    end
+
+    WEB -->|"browser fetches /bcn/ files<br/>route depends on admin environment"| Browser["Browser<br/>BlueMap UI + roster overlay"]
+    BM -->|"BlueMap map and native markers"| Browser
+    OptionalProxy["Optional webserver / reverse proxy<br/>admin-managed"] -. "optional same-origin route" .-> WEB
+```
+
+BlueMapCommunityNames adds only its own roster overlay. BlueMap map rendering, BlueMap
+native markers, LuckPerms data, and optional webserver/reverse-proxy routing remain
+admin-managed.
+
 ## Tested Environment
 
 BlueMapCommunityNames was developed and validated on Paper 26.1.2 with Java 25, BlueMap,
