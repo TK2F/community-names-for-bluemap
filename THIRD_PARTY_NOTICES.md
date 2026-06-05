@@ -65,8 +65,13 @@ administrator-managed and are outside this plugin's responsibility boundary.
 
 ## Non-Affiliation Notice
 
+We are grateful to the developers, server operators, administrators, and community
+members across the Minecraft ecosystem whose work and feedback make community server
+projects possible.
+
 BlueMapCommunityNames is an independent plugin and is not affiliated with, endorsed by,
-or supported by Mojang, Microsoft, Minecraft, BlueMap, LuckPerms, Geyser, or Floodgate.
+or supported by Mojang, Microsoft, Minecraft, BlueMap, LuckPerms, Geyser, Floodgate, or
+Paper.
 
 ## Notes
 

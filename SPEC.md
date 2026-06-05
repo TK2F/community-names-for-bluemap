@@ -215,7 +215,11 @@ That is a tested environment note, not a deployment requirement.
 
 ## Credits and Attribution
 
+Public docs should thank the maintainers and contributors of BlueMap, LuckPerms, Geyser,
+Floodgate, and Paper, plus the developers, server operators, administrators, and
+community members across the Minecraft ecosystem whose work and feedback make community
+server projects possible.
+
 BlueMapCommunityNames is independent and is not affiliated with, endorsed by, or
-supported by Mojang, Microsoft, Minecraft, BlueMap, LuckPerms, Geyser, or Floodgate.
-Public release docs should thank those maintainers and contributors and verify upstream
-licenses from official sources before release.
+supported by Mojang, Microsoft, Minecraft, BlueMap, LuckPerms, Geyser, Floodgate, or
+Paper.

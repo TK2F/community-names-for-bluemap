@@ -203,7 +203,10 @@ LuckPerms folders.
 ## Credits
 
 Thanks to the maintainers and contributors of BlueMap, LuckPerms, Geyser, and Floodgate.
-BlueMapCommunityNames is an independent plugin and is not affiliated with, endorsed by,
-or supported by Mojang, Microsoft, Minecraft, BlueMap, LuckPerms, Geyser, or Floodgate.
+We are grateful to the developers, server operators, administrators, and community
+members across the Minecraft ecosystem whose work and feedback make community server
+projects possible.
 
-Before a public release, verify upstream dependency licenses from official sources.
+BlueMapCommunityNames is an independent plugin and is not affiliated with, endorsed by,
+or supported by Mojang, Microsoft, Minecraft, BlueMap, LuckPerms, Geyser, Floodgate, or
+Paper.
