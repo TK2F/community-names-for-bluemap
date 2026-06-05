@@ -8,6 +8,22 @@ JavaScript, and CSS assets for the browser overlay.
 The plugin does not change BlueMap native marker names, hide markers, replace markers,
 rewrite BlueMap's player-list DOM, or write into BlueMap or LuckPerms folders.
 
+## Download
+
+Download the current public prerelease jar from GitHub Releases:
+
+- [BlueMapCommunityNames-0.2.0.jar](https://github.com/TK2F/community-names-for-bluemap/releases/download/v0.2.0/BlueMapCommunityNames-0.2.0.jar)
+- [Release notes and SHA-256](https://github.com/TK2F/community-names-for-bluemap/releases/tag/v0.2.0)
+
+SHA-256:
+
+```text
+5b2393282c1b00efdc7dafe6fc3cc9232ac97274331b97763c6f9ae6f1edfbee
+```
+
+This is a prerelease. BlueMap, LuckPerms, and any optional Geyser/Floodgate or
+webserver/reverse-proxy components must be installed and managed separately.
+
 ## Requirements
 
 - Paper-compatible Minecraft server
@@ -96,7 +112,8 @@ Do not commit build output or plugin jars.
 
 1. Install and configure BlueMap separately.
 2. Install and configure LuckPerms separately.
-3. Build `BlueMapCommunityNames-0.2.0.jar`.
+3. Download `BlueMapCommunityNames-0.2.0.jar` from the current GitHub Release, or build
+   it yourself from source.
 4. Place the BlueMapCommunityNames jar in the server `plugins/` directory.
 5. Start the server once to generate `plugins/BlueMapCommunityNames/config.yml`.
 6. Configure the roster fields and display mode.
