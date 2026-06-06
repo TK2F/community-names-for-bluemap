@@ -1,9 +1,10 @@
 # CommunityNames for BlueMap
 
-BlueMapCommunityNames, published as CommunityNames for BlueMap, is an independent Paper
-plugin that adds a lightweight player roster overlay to the BlueMap web app. It reads
-configured LuckPerms meta values for online players and publishes plugin-owned JSON,
-JavaScript, and CSS assets for the browser overlay.
+BlueMapCommunityNames, published as CommunityNames for BlueMap, is an independent PaperMC
+plugin for Minecraft servers that adds a lightweight player roster overlay to the
+BlueMap web app. It can show online Java and Bedrock/Floodgate players with
+public-safe aliases, configurable LuckPerms metadata chips, filters, and search while
+publishing plugin-owned JSON, JavaScript, and CSS assets for the browser overlay.
 
 The plugin does not change BlueMap native marker names, hide markers, replace markers,
 rewrite BlueMap's player-list DOM, or write into BlueMap or LuckPerms folders.
@@ -38,6 +39,22 @@ Optional:
   exposure model
 
 BlueMapCommunityNames does not bundle BlueMap, LuckPerms, Geyser, or Floodgate jars.
+
+## Screenshots
+
+![Roster overlay with metadata filters](docs/assets/screenshots/01-roster-filter-overview.png)
+
+The roster overlay can show public-safe aliases and configured LuckPerms metadata
+chips. Filters and search help server administrators inspect online players by
+configured metadata such as role or team. Player identifiers in these screenshots are
+blurred for privacy.
+
+![Settings panel with language and display options](docs/assets/screenshots/02-settings-language-display.png)
+
+The browser overlay settings are local to the current browser and include display options
+such as opacity, density, details visibility, and language. The UI supports Japanese
+and English display, so screenshots may show both languages when demonstrating the
+language switch.
 
 ## Responsibility Boundary
 
