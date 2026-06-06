@@ -29,7 +29,7 @@ BlueMap native live markers are not modified.
 1. Confirm BlueMap works before installing this plugin.
 2. Confirm LuckPerms works before installing this plugin.
 3. Stop the server if your operation policy requires offline plugin installation.
-4. Copy `BlueMapCommunityNames-0.2.0.jar` into the server `plugins/` directory.
+4. Copy `BlueMapCommunityNames-0.2.1.jar` into the server `plugins/` directory.
 5. Start the server.
 6. Confirm BlueMapCommunityNames enables after BlueMap and LuckPerms.
 7. Run:

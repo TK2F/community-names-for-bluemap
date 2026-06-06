@@ -43,7 +43,7 @@ flowchart TD
 ./gradlew clean test build --no-daemon
 ```
 
-4. Copy `build/libs/BlueMapCommunityNames-0.2.0.jar` to your server `plugins/`
+4. Copy `build/libs/BlueMapCommunityNames-0.2.1.jar` to your server `plugins/`
    directory.
 5. Start the server.
 6. Confirm the plugin generated `plugins/BlueMapCommunityNames/config.yml`.

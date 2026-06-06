@@ -13,13 +13,13 @@ rewrite BlueMap's player-list DOM, or write into BlueMap or LuckPerms folders.
 
 Download the current public prerelease jar from GitHub Releases:
 
-- [BlueMapCommunityNames-0.2.0.jar](https://github.com/TK2F/community-names-for-bluemap/releases/download/v0.2.0/BlueMapCommunityNames-0.2.0.jar)
-- [Release notes and SHA-256](https://github.com/TK2F/community-names-for-bluemap/releases/tag/v0.2.0)
+- [BlueMapCommunityNames-0.2.1.jar](https://github.com/TK2F/community-names-for-bluemap/releases/download/v0.2.1/BlueMapCommunityNames-0.2.1.jar)
+- [Release notes and SHA-256](https://github.com/TK2F/community-names-for-bluemap/releases/tag/v0.2.1)
 
 SHA-256:
 
 ```text
-5b2393282c1b00efdc7dafe6fc3cc9232ac97274331b97763c6f9ae6f1edfbee
+838947dc09f8564319a3573df3571cc1dc9d0441c82ba784df90232ef9e4d93d
 ```
 
 This is a prerelease. BlueMap, LuckPerms, and any optional Geyser/Floodgate or
@@ -120,7 +120,7 @@ Use Java 25:
 The plugin jar is generated at:
 
 ```text
-build/libs/BlueMapCommunityNames-0.2.0.jar
+build/libs/BlueMapCommunityNames-0.2.1.jar
 ```
 
 Do not commit build output or plugin jars.
@@ -129,7 +129,7 @@ Do not commit build output or plugin jars.
 
 1. Install and configure BlueMap separately.
 2. Install and configure LuckPerms separately.
-3. Download `BlueMapCommunityNames-0.2.0.jar` from the current GitHub Release, or build
+3. Download `BlueMapCommunityNames-0.2.1.jar` from the current GitHub Release, or build
    it yourself from source.
 4. Place the BlueMapCommunityNames jar in the server `plugins/` directory.
 5. Start the server once to generate `plugins/BlueMapCommunityNames/config.yml`.
