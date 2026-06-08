@@ -4,6 +4,10 @@ This file summarizes third-party projects that CommunityNames for BlueMap integr
 with or targets. It is a public-facing credit and dependency-boundary document, not
 legal advice.
 
+CommunityNames for BlueMap / BlueMapCommunityNames itself is licensed under the GNU
+General Public License version 3.0 or later. See [LICENSE](LICENSE) and
+[docs/LICENSING.md](docs/LICENSING.md). Third-party projects retain their own licenses.
+
 ## Dependency Boundary
 
 CommunityNames for BlueMap / BlueMapCommunityNames does not bundle BlueMap, LuckPerms,

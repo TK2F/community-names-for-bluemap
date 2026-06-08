@@ -148,6 +148,9 @@ See:
 
 Security policy: see [SECURITY.md](SECURITY.md).
 
+License: CommunityNames for BlueMap is licensed under the GNU General Public License
+v3.0 or later. See [LICENSE](LICENSE) and [Licensing](docs/LICENSING.md).
+
 Third-party notices and dependency boundary: see
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
