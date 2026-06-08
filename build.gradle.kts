@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.tk2lab.bluemapcommunitynames"
-version = "0.2.1"
+version = "0.2.2"
 
 repositories {
     mavenCentral()

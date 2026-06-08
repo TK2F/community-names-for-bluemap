@@ -19,7 +19,7 @@ test reports.
 ## Install On Test Server
 
 1. Stop the server if required by your operation policy.
-2. Copy `BlueMapCommunityNames-0.2.1.jar` to the server `plugins/` directory.
+2. Copy `BlueMapCommunityNames-0.2.2.jar` to the server `plugins/` directory.
 3. Start the server.
 4. Confirm BlueMap and LuckPerms load before BlueMapCommunityNames.
 5. Confirm BlueMapCommunityNames enables without errors.

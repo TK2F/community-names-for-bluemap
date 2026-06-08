@@ -36,15 +36,14 @@ following the GPL and preserving the required license notices and source availab
 
 This is a repository compliance note, not legal advice.
 
-## Existing Release Snapshots
+## Release Snapshots
 
-The v0.2.1 tag and release asset were published before this top-level license file was
-added to `main`. This documentation update does not rewrite existing tags, release
-assets, or GitHub Releases.
+The v0.2.0 and v0.2.1 tags and release assets were published before this top-level
+license file was added to `main`. This documentation update does not rewrite existing
+tags, release assets, or GitHub Releases.
 
-If a future release snapshot should include the top-level license file, create a normal
-follow-up release such as a license-alignment prerelease instead of modifying existing
-release artifacts.
+The v0.2.2 license-alignment prerelease is intended to be the first release source
+snapshot that includes the top-level `LICENSE` file and this licensing documentation.
 
 ## Non-Affiliation
 

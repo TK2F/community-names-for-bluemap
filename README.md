@@ -13,13 +13,13 @@ rewrite BlueMap's player-list DOM, or write into BlueMap or LuckPerms folders.
 
 Download the current public prerelease jar from GitHub Releases:
 
-- [BlueMapCommunityNames-0.2.1.jar](https://github.com/TK2F/community-names-for-bluemap/releases/download/v0.2.1/BlueMapCommunityNames-0.2.1.jar)
-- [Release notes and SHA-256](https://github.com/TK2F/community-names-for-bluemap/releases/tag/v0.2.1)
+- [BlueMapCommunityNames-0.2.2.jar](https://github.com/TK2F/community-names-for-bluemap/releases/download/v0.2.2/BlueMapCommunityNames-0.2.2.jar)
+- [Release notes and SHA-256](https://github.com/TK2F/community-names-for-bluemap/releases/tag/v0.2.2)
 
 SHA-256:
 
 ```text
-838947dc09f8564319a3573df3571cc1dc9d0441c82ba784df90232ef9e4d93d
+0d936bda4ded39bb85d9e5788f29900cf9e852c08fa9627f02394b8c60efb0f1
 ```
 
 This is a prerelease. BlueMap, LuckPerms, and any optional Geyser/Floodgate or
@@ -120,7 +120,7 @@ Use Java 25:
 The plugin jar is generated at:
 
 ```text
-build/libs/BlueMapCommunityNames-0.2.1.jar
+build/libs/BlueMapCommunityNames-0.2.2.jar
 ```
 
 Do not commit build output or plugin jars.
@@ -129,7 +129,7 @@ Do not commit build output or plugin jars.
 
 1. Install and configure BlueMap separately.
 2. Install and configure LuckPerms separately.
-3. Download `BlueMapCommunityNames-0.2.1.jar` from the current GitHub Release, or build
+3. Download `BlueMapCommunityNames-0.2.2.jar` from the current GitHub Release, or build
    it yourself from source.
 4. Place the BlueMapCommunityNames jar in the server `plugins/` directory.
 5. Start the server once to generate `plugins/BlueMapCommunityNames/config.yml`.
@@ -148,10 +148,12 @@ See:
 
 Security policy: see [SECURITY.md](SECURITY.md).
 
-License: CommunityNames for BlueMap is licensed under the GNU General Public License
-v3.0 or later. See [LICENSE](LICENSE) and [Licensing](docs/LICENSING.md).
+## License
 
-Third-party notices and dependency boundary: see
+CommunityNames for BlueMap is licensed under the GNU General Public License v3.0 or
+later. See [LICENSE](LICENSE) and [Licensing](docs/LICENSING.md).
+
+Third-party dependencies and projects retain their own licenses. See
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Roster Configuration
