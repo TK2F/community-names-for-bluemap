@@ -22,8 +22,8 @@ intended in v0.2.1.
 
 ## Security Posture
 
-Secret scanning and push protection were enabled for the public repository before this
-release preparation. Security Policy UI recognition remains a manual GitHub UI check.
+The public repository includes security reporting guidance, and GitHub secret scanning
+and push protection were enabled before this release.
 
 ## Artifact
 

@@ -2,11 +2,9 @@
 
 ## Supported Versions
 
-Before the first public release, no public release is supported for security fixes.
-
-After the first public release, only the latest GitHub release is supported for security
-fixes unless the release notes say otherwise. Older development snapshots, local builds,
-and modified builds are not supported.
+Only the latest GitHub release is supported for security fixes unless the release notes
+say otherwise. Older prereleases, development snapshots, local builds, and modified
+builds are not supported.
 
 ## Reporting a Vulnerability
 
@@ -59,4 +57,5 @@ redirected to the relevant project or administrator.
 ## Non-Affiliation Notice
 
 BlueMapCommunityNames is an independent plugin and is not affiliated with, endorsed by,
-or supported by Mojang, Microsoft, Minecraft, BlueMap, LuckPerms, Geyser, or Floodgate.
+or supported by Mojang, Microsoft, Minecraft, BlueMap, LuckPerms, Geyser, Floodgate, or
+Paper.

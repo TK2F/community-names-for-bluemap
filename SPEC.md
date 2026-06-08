@@ -103,9 +103,9 @@ BlueMapCommunityNames generates web files under its own plugin folder and regist
 
 Some server environments may need a same-origin `/bcn/` route so the browser can fetch
 the generated files. nginx is one possible way to do that, but it is optional and
-environment-specific. Public docs may include a placeholder reverse-proxy example, but
-must not imply that nginx is required or that every BlueMap/proxy topology is supported
-by this plugin.
+environment-specific. Any reverse-proxy example for this plugin is illustrative and does
+not imply that nginx is required or that every BlueMap/proxy topology is supported by
+this plugin.
 
 If `/bcn/` is not reachable from the browser:
 
@@ -210,15 +210,15 @@ Browser controls do not edit server config, LuckPerms keys, or player meta.
 ## Compatibility Notes
 
 The plugin has been validated with Paper 26.1.2, Java 25, BlueMap, LuckPerms, and optional
-Geyser/Floodgate. One WSL2 validation used local nginx with same-origin `/bcn/` routing.
-That is a tested environment note, not a deployment requirement.
+Geyser/Floodgate in a local test environment. Optional same-origin `/bcn/` routing was
+also tested. That is a tested environment note, not a deployment requirement.
 
 ## Credits and Attribution
 
-Public docs should thank the maintainers and contributors of BlueMap, LuckPerms, Geyser,
-Floodgate, and Paper, plus the developers, server operators, administrators, and
-community members across the Minecraft ecosystem whose work and feedback make community
-server projects possible.
+Thanks to the maintainers and contributors of BlueMap, LuckPerms, Geyser, Floodgate, and
+Paper, plus the developers, server operators, administrators, and community members
+across the Minecraft ecosystem whose work and feedback make community server projects
+possible.
 
 BlueMapCommunityNames is independent and is not affiliated with, endorsed by, or
 supported by Mojang, Microsoft, Minecraft, BlueMap, LuckPerms, Geyser, Floodgate, or

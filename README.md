@@ -105,9 +105,9 @@ admin-managed.
 ## Tested Environment
 
 BlueMapCommunityNames was developed and validated on Paper 26.1.2 with Java 25, BlueMap,
-LuckPerms, and optional Geyser/Floodgate. One WSL2 validation used local nginx with
-same-origin `/bcn/` routing. This is a tested environment note, not a requirement or a
-universal deployment model.
+LuckPerms, and optional Geyser/Floodgate in a local test environment. Optional
+same-origin `/bcn/` routing was also tested. This is a tested environment note, not a
+requirement or a universal deployment model.
 
 ## Build
 

@@ -23,6 +23,3 @@ Validated with Paper 26.1.2, Java 25, BlueMap, LuckPerms, and optional Geyser/Fl
 - nginx or reverse proxy setup is optional and administrator-managed.
 - BlueMapCommunityNames is independent and is not affiliated with, endorsed by, or
   supported by Mojang, Microsoft, Minecraft, BlueMap, LuckPerms, Geyser, or Floodgate.
-
-Before publishing a release, re-verify upstream licenses and finalize artifact/tag
-strategy.

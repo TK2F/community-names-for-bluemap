@@ -10,9 +10,9 @@ BlueMapCommunityNames, published as CommunityNames for BlueMap, has been validat
 - LuckPerms 5.5.x
 - Geyser/Floodgate for optional Bedrock smoke testing
 
-One WSL2 validation used local nginx with same-origin `/bcn/` routing. This is not a
-requirement and does not mean every nginx or reverse-proxy topology is supported by this
-plugin.
+Optional same-origin `/bcn/` routing was also tested in a local environment. This is not
+a requirement and does not mean every nginx or reverse-proxy topology is supported by
+this plugin.
 
 ## Required Dependencies
 
